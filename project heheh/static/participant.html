@@ -260,7 +260,7 @@ document.addEventListener('click', async (e) => {
     const feedbackEl = document.getElementById('submit-feedback');
     const githubLink = document.getElementById('repo-url').value.trim();
     const projectDesc = document.getElementById('project-desc').value.trim();
-    const screenshot = document.getElementById('screenshot-url').value.trim();
+    const screenshot = JSON.stringify(window.screenshotUrls);
     const teamId = parseInt(sessionStorage.getItem('team_id'));
 
     feedbackEl.classList.add('hidden');
@@ -322,15 +322,17 @@ document.addEventListener('click', (e) => {
     if (e.target.closest('#edit-btn')) {
         const repoInput = document.getElementById('repo-url');
         const descInput = document.getElementById('project-desc');
-        const screenshotInput = document.getElementById('screenshot-url');
         const submitBtn = document.getElementById('submit-btn');
         const submitBtnText = document.getElementById('submit-btn-text');
         const submitBtnIcon = document.getElementById('submit-btn-icon');
         const editBtn = document.getElementById('edit-btn');
+        const dropZone = document.getElementById('drop-zone');
         
         repoInput.disabled = false;
         descInput.disabled = false;
-        screenshotInput.disabled = false;
+        
+        if (dropZone) dropZone.classList.remove('opacity-50', 'pointer-events-none');
+        renderScreenshotThumbnails(false);
         
         submitBtn.classList.remove('opacity-50', 'pointer-events-none');
         if (submitBtnText) submitBtnText.textContent = 'Save Changes';
@@ -340,21 +342,141 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Screenshot URL live preview
-document.addEventListener('input', (e) => {
-    if (e.target.id === 'screenshot-url') {
-        const val = e.target.value.trim();
-        const previewBox = document.getElementById('preview-box');
-        const previewImg = document.getElementById('screenshot-preview');
-        
-        if (val) {
-            previewImg.src = val;
-            previewBox.classList.remove('hidden');
-        } else {
-            previewBox.classList.add('hidden');
+// Drag & drop handlers
+document.addEventListener('dragover', (e) => {
+    const dropZone = document.getElementById('drop-zone');
+    if (dropZone && e.target.closest('#drop-zone')) {
+        e.preventDefault();
+        dropZone.classList.add('border-primary-fixed', 'bg-surface-variant/20');
+    }
+});
+
+document.addEventListener('dragleave', (e) => {
+    const dropZone = document.getElementById('drop-zone');
+    if (dropZone && e.target.closest('#drop-zone')) {
+        dropZone.classList.remove('border-primary-fixed', 'bg-surface-variant/20');
+    }
+});
+
+document.addEventListener('drop', async (e) => {
+    const dropZone = document.getElementById('drop-zone');
+    if (dropZone && e.target.closest('#drop-zone')) {
+        e.preventDefault();
+        dropZone.classList.remove('border-primary-fixed', 'bg-surface-variant/20');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            await handleScreenshotUpload(files);
         }
     }
 });
+
+document.addEventListener('click', (e) => {
+    const dropZone = e.target.closest('#drop-zone');
+    if (dropZone) {
+        const input = document.getElementById('screenshot-file-input');
+        if (input && e.target !== input) {
+            input.click();
+        }
+    }
+});
+
+document.addEventListener('change', async (e) => {
+    if (e.target.id === 'screenshot-file-input') {
+        const files = e.target.files;
+        if (files.length > 0) {
+            await handleScreenshotUpload(files);
+        }
+    }
+});
+
+async function handleScreenshotUpload(files) {
+    const feedbackEl = document.getElementById('submit-feedback');
+    feedbackEl.classList.add('hidden');
+    
+    // Check limit
+    if (window.screenshotUrls.length + files.length > 5) {
+        feedbackEl.textContent = 'You can upload a maximum of 5 screenshots.';
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        return;
+    }
+    
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+    }
+    
+    const dropZone = document.getElementById('drop-zone');
+    const oldHTML = dropZone ? dropZone.innerHTML : '';
+    if (dropZone) {
+        dropZone.innerHTML = `
+            <span class="material-symbols-outlined text-4xl text-primary-fixed mb-2 animate-spin">progress_activity</span>
+            <p class="text-on-surface font-body-md text-sm font-semibold">Uploading screenshots...</p>
+        `;
+    }
+    
+    try {
+        const res = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!res.ok) throw new Error('Upload failed');
+        const data = await res.json();
+        
+        window.screenshotUrls.push(...data.urls);
+        renderScreenshotThumbnails(false);
+        
+    } catch(err) {
+        console.error(err);
+        feedbackEl.textContent = 'Failed to upload screenshots. Please try again.';
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+    } finally {
+        if (dropZone) {
+            dropZone.innerHTML = `
+                <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">cloud_upload</span>
+                <p class="text-on-surface font-body-md text-sm font-semibold">Drag and drop screenshots here or click to browse</p>
+                <p class="text-on-surface-variant text-xs mt-1">Supports PNG, JPG, JPEG, WEBP</p>
+                <input type="file" id="screenshot-file-input" class="hidden" multiple accept="image/*" />
+            `;
+        }
+    }
+}
+
+// Global state
+window.screenshotUrls = [];
+
+function renderScreenshotThumbnails(isLocked = false) {
+    const container = document.getElementById('screenshot-thumbnails');
+    if (!container) return;
+    
+    if (window.screenshotUrls.length === 0) {
+        container.innerHTML = '<p class="col-span-full text-on-surface-variant/50 text-sm italic py-2">No screenshots uploaded yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = window.screenshotUrls.map((url, index) => {
+        const deleteOverlay = isLocked 
+            ? '' 
+            : `<div class="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-200">
+                   <button onclick="removeScreenshot(${index})" type="button" class="bg-error-container text-error p-2 rounded-full hover:scale-110 transition-transform">
+                       <span class="material-symbols-outlined text-[20px]">delete</span>
+                   </button>
+               </div>`;
+        return `
+        <div class="relative group rounded-xl overflow-hidden aspect-video border border-surface-container-highest bg-surface-container-low shadow-sm">
+            <img src="${url}" class="w-full h-full object-cover" alt="Screenshot" />
+            ${deleteOverlay}
+        </div>
+        `;
+    }).join('');
+}
+
+function removeScreenshot(index) {
+    window.screenshotUrls.splice(index, 1);
+    renderScreenshotThumbnails(false);
+}
 
 // Render submission tab template
 function renderSubmissionsTabHTML() {
@@ -387,18 +509,21 @@ function renderSubmissionsTabHTML() {
             </div>
             
             <div class="flex flex-col gap-xs">
-                <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="screenshot-url">
+                <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2">
                     <span class="material-symbols-outlined text-[16px]">image</span>
-                    Screenshot Image URL
+                    Upload Screenshots (Max 5 images)
                 </label>
-                <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md placeholder-on-surface-variant/50 focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px] disabled:opacity-50 disabled:bg-surface-container-low" id="screenshot-url" placeholder="https://example.com/screenshot.png" type="url"/>
+                <div id="drop-zone" class="w-full border-2 border-dashed border-surface-container-highest rounded-2xl p-6 flex flex-col items-center justify-center bg-surface-container-lowest hover:border-primary-fixed/50 hover:bg-surface-variant/10 transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">cloud_upload</span>
+                    <p class="text-on-surface font-body-md text-sm font-semibold">Drag and drop screenshots here or click to browse</p>
+                    <p class="text-on-surface-variant text-xs mt-1">Supports PNG, JPG, JPEG, WEBP</p>
+                    <input type="file" id="screenshot-file-input" class="hidden" multiple accept="image/*" />
+                </div>
             </div>
             
-            <div id="preview-box" class="hidden flex flex-col gap-xs mt-2">
-                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Screenshot Preview:</span>
-                <div class="border border-surface-container-highest rounded-2xl overflow-hidden max-h-60 flex items-center justify-center bg-surface-container-low">
-                    <img id="screenshot-preview" src="" alt="Screenshot preview" class="w-full h-full object-cover"/>
-                </div>
+            <!-- Thumbnail List -->
+            <div id="screenshot-thumbnails" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
+                <!-- Image thumbnails will render here -->
             </div>
             
             <div id="submit-feedback" class="hidden px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center"></div>
@@ -429,31 +554,25 @@ async function loadSubmissionDetails() {
         
         const repoInput = document.getElementById('repo-url');
         const descInput = document.getElementById('project-desc');
-        const screenshotInput = document.getElementById('screenshot-url');
         const submitBtn = document.getElementById('submit-btn');
         const submitBtnText = document.getElementById('submit-btn-text');
         const submitBtnIcon = document.getElementById('submit-btn-icon');
         const editBtn = document.getElementById('edit-btn');
-        const previewBox = document.getElementById('preview-box');
-        const previewImg = document.getElementById('screenshot-preview');
+        const dropZone = document.getElementById('drop-zone');
         
         if (!repoInput) return; // submissions tab not rendered yet
 
         repoInput.value = team.github_link || '';
         descInput.value = team.project_description || '';
-        screenshotInput.value = team.screenshot || '';
         
-        if (team.screenshot) {
-            previewImg.src = team.screenshot;
-            previewBox.classList.remove('hidden');
-        } else {
-            previewBox.classList.add('hidden');
-        }
+        window.screenshotUrls = team.screenshots || [];
         
         if (team.submission_status === 'submitted') {
             repoInput.disabled = true;
             descInput.disabled = true;
-            screenshotInput.disabled = true;
+            
+            if (dropZone) dropZone.classList.add('opacity-50', 'pointer-events-none');
+            renderScreenshotThumbnails(true);
             
             editBtn.classList.remove('hidden');
             
@@ -465,7 +584,9 @@ async function loadSubmissionDetails() {
         } else {
             repoInput.disabled = false;
             descInput.disabled = false;
-            screenshotInput.disabled = false;
+            
+            if (dropZone) dropZone.classList.remove('opacity-50', 'pointer-events-none');
+            renderScreenshotThumbnails(false);
             
             editBtn.classList.add('hidden');
             
@@ -480,6 +601,192 @@ async function loadSubmissionDetails() {
         console.error(err);
     }
 }
+
+function renderSettingsTabHTML() {
+    return `
+    <div class="w-full max-w-2xl bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high shadow-2xl relative overflow-hidden group p-md md:p-xl flex flex-col gap-lg overflow-y-auto max-h-[85vh]">
+        <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-lowest border-2 border-outline-variant mb-4 relative">
+                <span class="material-symbols-outlined text-3xl text-primary-fixed">settings</span>
+            </div>
+            <h2 class="font-headline-lg-mobile md:font-headline-lg text-primary-fixed mb-2">Participant Profile Settings</h2>
+            <p class="text-on-surface-variant font-body-md">Update your personal profile details below.</p>
+        </div>
+        
+        <form id="settings-form" class="flex flex-col gap-md">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Username (Read-only) -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant/80 uppercase flex items-center gap-2" for="profile-username">
+                        <span class="material-symbols-outlined text-[16px]">alternate_email</span>
+                        Username
+                    </label>
+                    <input class="w-full bg-surface-container-low border border-surface-container-highest rounded-2xl p-4 text-on-surface-variant font-body-md cursor-not-allowed outline-none h-[60px] opacity-75" id="profile-username" type="text" readonly disabled/>
+                </div>
+                
+                <!-- Full Name -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="profile-name">
+                        <span class="material-symbols-outlined text-[16px]">person</span>
+                        Full Name
+                    </label>
+                    <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="profile-name" placeholder="John Doe" type="text"/>
+                </div>
+                
+                <!-- Email -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="profile-email">
+                        <span class="material-symbols-outlined text-[16px]">mail</span>
+                        Email Address
+                    </label>
+                    <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="profile-email" placeholder="john@example.com" type="email"/>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Phone Number -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="profile-phone">
+                        <span class="material-symbols-outlined text-[16px]">phone</span>
+                        Phone Number
+                    </label>
+                    <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="profile-phone" placeholder="+1234567890" type="tel"/>
+                </div>
+                
+                <!-- College -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="profile-college">
+                        <span class="material-symbols-outlined text-[16px]">school</span>
+                        College / University
+                    </label>
+                    <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="profile-college" placeholder="MIT" type="text"/>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="flex flex-col gap-xs">
+                <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="profile-address">
+                    <span class="material-symbols-outlined text-[16px]">home</span>
+                    Address
+                </label>
+                <textarea class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none min-h-[80px]" id="profile-address" placeholder="123 Main St, City, Country"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- LinkedIn Profile -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="profile-linkedin">
+                        <span class="material-symbols-outlined text-[16px]">link</span>
+                        LinkedIn Profile URL
+                    </label>
+                    <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="profile-linkedin" placeholder="https://linkedin.com/in/username" type="url"/>
+                </div>
+                
+                <!-- GitHub Profile -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="profile-github">
+                        <span class="material-symbols-outlined text-[16px]">link</span>
+                        GitHub Profile URL
+                    </label>
+                    <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="profile-github" placeholder="https://github.com/username" type="url"/>
+                </div>
+            </div>
+
+            <div id="settings-feedback" class="hidden px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center"></div>
+            
+            <div class="mt-4 pt-md border-t border-surface-container-highest">
+                <button id="save-profile-btn" class="w-full bg-primary-fixed text-on-primary-fixed rounded-2xl py-4 px-8 font-headline-lg-mobile font-bold border-2 border-surface-container-lowest shadow-[0_6px_0_0_#0e0e0e] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#0e0e0e] active:translate-y-[6px] active:shadow-none transition-all flex items-center justify-center gap-3" type="button">
+                    <span>Save Profile</span>
+                    <span class="material-symbols-outlined font-bold text-2xl">save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+    `;
+}
+
+async function loadProfileDetails() {
+    const userId = sessionStorage.getItem('user_id');
+    if (!userId) return;
+    
+    try {
+        const res = await fetch(`/participant/profile/${userId}`);
+        if (!res.ok) throw new Error("Failed to load profile details");
+        const user = await res.json();
+        
+        const nameInp = document.getElementById('profile-name');
+        if (!nameInp) return; // Settings tab not rendered yet
+        
+        document.getElementById('profile-username').value = user.username || '';
+        nameInp.value = user.full_name || '';
+        document.getElementById('profile-email').value = user.email || '';
+        document.getElementById('profile-phone').value = user.phone || '';
+        document.getElementById('profile-college').value = user.college || '';
+        document.getElementById('profile-address').value = user.address || '';
+        document.getElementById('profile-linkedin').value = user.linkedin || '';
+        document.getElementById('profile-github').value = user.github || '';
+        
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+// Save Profile handler
+document.addEventListener('click', async (e) => {
+    const saveBtn = e.target.closest('#save-profile-btn');
+    if (!saveBtn) return;
+    e.preventDefault();
+    
+    const btn = document.getElementById('save-profile-btn');
+    const feedbackEl = document.getElementById('settings-feedback');
+    const userId = parseInt(sessionStorage.getItem('user_id'));
+    
+    const fullName = document.getElementById('profile-name').value.trim();
+    const email = document.getElementById('profile-email').value.trim();
+    const phone = document.getElementById('profile-phone').value.trim();
+    const college = document.getElementById('profile-college').value.trim();
+    const address = document.getElementById('profile-address').value.trim();
+    const linkedin = document.getElementById('profile-linkedin').value.trim();
+    const github = document.getElementById('profile-github').value.trim();
+    
+    feedbackEl.classList.add('hidden');
+    btn.disabled = true;
+    const btnTextEl = btn.querySelector('span:first-child');
+    const originalText = btnTextEl ? btnTextEl.textContent : 'Save Profile';
+    if (btnTextEl) btnTextEl.textContent = 'Saving...';
+    
+    try {
+        const res = await fetch(`/participant/profile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: userId,
+                full_name: fullName,
+                email: email,
+                phone: phone,
+                college: college,
+                address: address,
+                linkedin: linkedin,
+                github: github
+            })
+        });
+        
+        if (!res.ok) throw new Error('Failed to update profile');
+        
+        feedbackEl.textContent = '✓ Profile updated successfully!';
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-secondary-fixed/20 border border-secondary-fixed/30 text-secondary-fixed';
+        feedbackEl.classList.remove('hidden');
+        
+    } catch(err) {
+        feedbackEl.textContent = err.message;
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        if (btnTextEl) btnTextEl.textContent = originalText;
+    }
+});
 
 async function loadDashboardData() {
     const teamId = sessionStorage.getItem('team_id');
@@ -661,8 +968,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelectorAll('aside nav a, nav.md\\:hidden a');
     const mainCanvas = document.querySelector('main');
     
-    // Create tab contents if they don't exist
-    const tabs = ['schedule', 'settings', 'drafts', 'events', 'profile', 'help'];
+    // Create tab contents if they don't exist (excluding manually created ones)
+    const tabs = ['schedule', 'drafts', 'events', 'profile', 'help'];
     
     // Wrap existing content in a dashboard tab
     const existingContent = Array.from(mainCanvas.children).filter(el => el.tagName !== 'SCRIPT');
@@ -678,6 +985,13 @@ document.addEventListener('DOMContentLoaded', () => {
     submissionsTab.className = 'tab-content hidden relative z-10 min-h-full flex flex-col items-center justify-center p-8 w-full';
     submissionsTab.innerHTML = renderSubmissionsTabHTML();
     mainCanvas.appendChild(submissionsTab);
+
+    // Create settings tab
+    const settingsTab = document.createElement('div');
+    settingsTab.id = 'tab-settings';
+    settingsTab.className = 'tab-content hidden relative z-10 min-h-full flex flex-col items-center justify-center p-8 w-full';
+    settingsTab.innerHTML = renderSettingsTabHTML();
+    mainCanvas.appendChild(settingsTab);
 
     // Create an empty teams tab that will be populated by loadAllTeams()
     const teamsTab = document.createElement('div');
@@ -768,6 +1082,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tabName === 'teams') loadAllTeams();
             else if (tabName === 'submissions') loadSubmissionDetails();
             else if (tabName === 'dashboard') loadDashboardData();
+            else if (tabName === 'settings') loadProfileDetails();
         });
     });
 

@@ -257,11 +257,12 @@
                             <p id="project-description-text" class="text-on-surface text-sm font-body-md leading-relaxed"></p>
                         </div>
                         <div>
-                            <span class="text-xs font-label-sm uppercase text-on-surface-variant block mb-2">Screenshot</span>
-                            <div class="border border-surface-variant rounded-lg overflow-hidden max-h-40 flex items-center justify-center bg-surface-container-low">
-                                <img id="project-screenshot-img" src="" alt="Project Screenshot" class="w-full h-full object-cover hidden" />
+                            <span class="text-xs font-label-sm uppercase text-on-surface-variant block mb-2">Screenshots</span>
+                            <!-- Gallery Grid -->
+                            <div id="project-screenshots-grid" class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto hidden">
+                                <!-- Screenshots will be injected here -->
                             </div>
-                            <span id="no-screenshot-text" class="text-on-surface-variant text-sm font-body-md italic hidden">No screenshot provided</span>
+                            <span id="no-screenshot-text" class="text-on-surface-variant text-sm font-body-md italic hidden">No screenshots provided</span>
                         </div>
                     </div>
                     
@@ -412,15 +413,23 @@
                     const desc = document.getElementById('project-description-text');
                     desc.textContent = team.project_description || 'No description provided.';
                     
-                    const img = document.getElementById('project-screenshot-img');
+                    const grid = document.getElementById('project-screenshots-grid');
                     const noImg = document.getElementById('no-screenshot-text');
-                    if (team.screenshot) {
-                        img.src = team.screenshot;
-                        img.classList.remove('hidden');
+                    
+                    if (team.screenshots && team.screenshots.length > 0) {
+                        grid.innerHTML = team.screenshots.map(url => `
+                            <div onclick="openLightbox('${url}')" class="relative group rounded-lg overflow-hidden aspect-video border border-surface-variant bg-surface-container-low cursor-zoom-in hover:scale-95 transition-all">
+                                <img src="${url}" class="w-full h-full object-cover" alt="Screenshot" />
+                                <div class="absolute inset-0 bg-background/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+                                    <span class="material-symbols-outlined text-white">zoom_in</span>
+                                </div>
+                            </div>
+                        `).join('');
+                        grid.classList.remove('hidden');
                         noImg.classList.add('hidden');
                     } else {
-                        img.src = '';
-                        img.classList.add('hidden');
+                        grid.innerHTML = '';
+                        grid.classList.add('hidden');
                         noImg.classList.remove('hidden');
                     }
                 }
@@ -779,6 +788,19 @@
             }
         });
 
+        // Lightbox script handlers
+        function openLightbox(url) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            img.src = url;
+            lightbox.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('hidden');
+        }
+
     </script>
     <!-- Modal for displaying team members -->
     <div id="members-modal" class="fixed inset-0 z-50 hidden bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -794,6 +816,16 @@
                     <!-- Injected dynamically -->
                 </div>
             </div>
+        </div>
+    </div>
+    
+    <!-- Lightbox Overlay for viewing screenshots -->
+    <div id="lightbox" class="fixed inset-0 z-50 hidden bg-background/95 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer" onclick="closeLightbox()">
+        <button class="absolute top-6 right-6 text-on-surface hover:text-primary-fixed p-2 rounded-full hover:bg-surface-variant/50 transition-colors">
+            <span class="material-symbols-outlined text-3xl">close</span>
+        </button>
+        <div class="max-w-4xl max-h-[80vh] overflow-hidden rounded-2xl border border-surface-variant shadow-2xl">
+            <img id="lightbox-img" src="" alt="Screenshot Full View" class="max-w-full max-h-[80vh] object-contain" />
         </div>
     </div>
 </body>

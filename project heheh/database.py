@@ -59,6 +59,21 @@ def init_db():
     except sqlite3.OperationalError:
         pass # Column already exists
 
+    # Schema migration: alter existing Users table for profile columns
+    for col, col_type in [
+        ("full_name", "VARCHAR(100) DEFAULT NULL"),
+        ("email", "VARCHAR(100) DEFAULT NULL"),
+        ("phone", "VARCHAR(20) DEFAULT NULL"),
+        ("college", "VARCHAR(150) DEFAULT NULL"),
+        ("address", "TEXT DEFAULT NULL"),
+        ("linkedin", "VARCHAR(255) DEFAULT NULL"),
+        ("github", "VARCHAR(255) DEFAULT NULL")
+    ]:
+        try:
+            cursor.execute(f"ALTER TABLE Users ADD COLUMN {col} {col_type}")
+        except sqlite3.OperationalError:
+            pass # Column already exists
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Evaluations (
             evaluation_id INTEGER PRIMARY KEY AUTOINCREMENT,

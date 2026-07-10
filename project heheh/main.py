@@ -3,7 +3,9 @@ main.py — FastAPI application for the Hackathon Management Platform.
 """
 
 import os
-from fastapi import FastAPI, HTTPException
+import uuid
+import shutil
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
@@ -20,6 +22,9 @@ from database import get_db, hash_password, init_db, seed_db
 async def lifespan(app: FastAPI):
     init_db()
     seed_db()
+    # Ensure static/uploads exists
+    upload_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
     yield
 
 
@@ -94,6 +99,17 @@ class RegisterRequest(BaseModel):
 class PublishRequest(BaseModel):
     team_id: int
     judge_id: int
+
+
+class ProfileRequest(BaseModel):
+    user_id: int
+    full_name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    college: str | None = None
+    address: str | None = None
+    linkedin: str | None = None
+    github: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -173,16 +189,49 @@ def login(body: LoginRequest):
 
 
 # ---------------------------------------------------------------------------
+# POST /upload
+# ---------------------------------------------------------------------------
+@app.post("/upload")
+async def upload_files(files: list[UploadFile] = File(...)):
+    """Save uploaded screenshot files to the local static uploads folder and return their URLs."""
+    saved_paths = []
+    upload_dir = os.path.join(STATIC_DIR, "uploads")
+    for file in files:
+        file_ext = os.path.splitext(file.filename)[1]
+        unique_filename = f"{uuid.uuid4()}{file_ext}"
+        file_path = os.path.join(upload_dir, unique_filename)
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        saved_paths.append(f"/static/uploads/{unique_filename}")
+        
+    return {"urls": saved_paths}
+
+
+# ---------------------------------------------------------------------------
 # GET /admin/dashboard
 # ---------------------------------------------------------------------------
 @app.get("/admin/dashboard")
 def admin_dashboard():
     """Return all teams and their submission statuses."""
+    import json
     conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams")
-    teams = [dict(row) for row in cursor.fetchall()]
+    teams = []
+    for row in cursor.fetchall():
+        t = dict(row)
+        screenshot_val = t.get("screenshot")
+        if screenshot_val:
+            try:
+                t["screenshots"] = json.loads(screenshot_val)
+            except Exception:
+                t["screenshots"] = [screenshot_val]
+        else:
+            t["screenshots"] = []
+        teams.append(t)
     conn.close()
 
     return {"teams": teams}
@@ -194,6 +243,7 @@ def admin_dashboard():
 @app.get("/judge/dashboard")
 def judge_dashboard():
     """Return only teams whose submission_status is 'submitted'."""
+    import json
     conn = get_db()
     cursor = conn.cursor()
 
@@ -201,7 +251,18 @@ def judge_dashboard():
         "SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams WHERE submission_status = ?",
         ("submitted",),
     )
-    teams = [dict(row) for row in cursor.fetchall()]
+    teams = []
+    for row in cursor.fetchall():
+        t = dict(row)
+        screenshot_val = t.get("screenshot")
+        if screenshot_val:
+            try:
+                t["screenshots"] = json.loads(screenshot_val)
+            except Exception:
+                t["screenshots"] = [screenshot_val]
+        else:
+            t["screenshots"] = []
+        teams.append(t)
     conn.close()
 
     return {"teams": teams}
@@ -270,11 +331,23 @@ def participant_submit(body: SubmitRequest):
 @app.get("/teams")
 def get_all_teams():
     """Return all teams and their submission statuses."""
+    import json
     conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams")
-    teams = [dict(row) for row in cursor.fetchall()]
+    teams = []
+    for row in cursor.fetchall():
+        t = dict(row)
+        screenshot_val = t.get("screenshot")
+        if screenshot_val:
+            try:
+                t["screenshots"] = json.loads(screenshot_val)
+            except Exception:
+                t["screenshots"] = [screenshot_val]
+        else:
+            t["screenshots"] = []
+        teams.append(t)
     conn.close()
 
     return {"teams": teams}
@@ -286,6 +359,7 @@ def get_all_teams():
 @app.get("/teams/{team_id}")
 def get_team_by_id(team_id: int):
     """Return a single team's details by ID."""
+    import json
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
@@ -296,7 +370,17 @@ def get_team_by_id(team_id: int):
     conn.close()
     if team is None:
         raise HTTPException(status_code=404, detail="Team not found")
-    return dict(team)
+    
+    team_dict = dict(team)
+    screenshot_val = team_dict.get("screenshot")
+    if screenshot_val:
+        try:
+            team_dict["screenshots"] = json.loads(screenshot_val)
+        except Exception:
+            team_dict["screenshots"] = [screenshot_val]
+    else:
+        team_dict["screenshots"] = []
+    return team_dict
 
 
 # ---------------------------------------------------------------------------
@@ -370,3 +454,43 @@ def get_participant_grades(team_id: int):
     conn.close()
 
     return {"published": True, "evaluations": evaluations}
+
+
+# ---------------------------------------------------------------------------
+# GET /participant/profile/{user_id}
+# ---------------------------------------------------------------------------
+@app.get("/participant/profile/{user_id}")
+def get_profile(user_id: int):
+    """Fetch profile details for a user."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT user_id, username, full_name, email, phone, college, address, linkedin, github FROM Users WHERE user_id = ?",
+        (user_id,)
+    )
+    user = cursor.fetchone()
+    conn.close()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return dict(user)
+
+
+# ---------------------------------------------------------------------------
+# POST /participant/profile
+# ---------------------------------------------------------------------------
+@app.post("/participant/profile")
+def update_profile(body: ProfileRequest):
+    """Update profile details for a user."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        UPDATE Users 
+        SET full_name = ?, email = ?, phone = ?, college = ?, address = ?, linkedin = ?, github = ?
+        WHERE user_id = ?
+        """,
+        (body.full_name, body.email, body.phone, body.college, body.address, body.linkedin, body.github, body.user_id)
+    )
+    conn.commit()
+    conn.close()
+    return {"message": "Profile updated successfully"}
