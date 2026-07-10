@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Judge Dashboard - ToyCad Hack</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#e2e2e2",
+                        "on-tertiary-container": "#636565",
+                        "surface-dim": "#131313",
+                        "outline": "#969179",
+                        "inverse-primary": "#695f00",
+                        "primary-fixed-dim": "#dbc90a",
+                        "primary-fixed": "#f9e534",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary": "#283500",
+                        "secondary": "#ffffff",
+                        "primary-container": "#f9e534",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#353534",
+                        "on-primary-fixed": "#201c00",
+                        "on-surface-variant": "#cdc7ac",
+                        "secondary-container": "#c3f400",
+                        "surface-container-low": "#1c1b1b",
+                        "primary": "#ffffff",
+                        "background": "#131313",
+                        "surface-bright": "#3a3939",
+                        "surface-tint": "#dbc90a",
+                        "on-surface": "#e5e2e1",
+                        "surface-container": "#201f1f",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary-container": "#556d00",
+                        "on-primary": "#363100",
+                        "on-secondary-fixed": "#161e00",
+                        "tertiary": "#ffffff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#706500",
+                        "surface": "#131313",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-surface": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed-variant": "#4f4800",
+                        "secondary-fixed-dim": "#abd600",
+                        "outline-variant": "#4a4733",
+                        "secondary-fixed": "#c3f400",
+                        "on-background": "#e5e2e1",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3c4d00",
+                        "on-tertiary-fixed-variant": "#454747"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "xl": "64px",
+                        "sm": "12px",
+                        "gutter": "20px",
+                        "margin-desktop": "40px",
+                        "lg": "48px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Space Grotesk"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 2px solid #262626;
+        }
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+        /* Range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #f9e534;
+            cursor: pointer;
+            margin-top: -10px;
+            border: 2px solid #131313;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #353534;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md grid-bg selection:bg-primary-fixed selection:text-on-primary-fixed flex flex-col md:flex-row overflow-hidden">
+<!-- Top Navigation (Mobile Only) -->
+<header class="md:hidden sticky top-0 z-50 bg-background/80 backdrop-blur-xl dark:bg-background/80 border-b-2 border-outline-variant flex justify-between items-center w-full px-margin-mobile py-base max-w-full flat no shadows">
+<div class="text-headline-lg-mobile font-headline-lg font-black text-primary-fixed tracking-tighter">ToyCreator</div>
+<button class="w-10 h-10 rounded-full glass-panel flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">menu</span>
+</button>
+</header>
+<!-- Side Navigation (Desktop) -->
+<nav class="hidden md:flex bg-surface-container-lowest dark:bg-surface-container-lowest h-screen w-64 rounded-r-xl border-r-2 border-outline-variant shadow-md flex-col z-40 py-lg fixed left-0 top-0">
+<div class="px-md mb-xl flex flex-col items-start gap-4">
+<div class="font-headline-lg text-headline-lg text-primary-fixed leading-none">ToyCreator</div>
+<div class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-widest">Judge Portal</div>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md">Teams</span>
+</a>
+<a class="bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+<span class="font-body-md">Submissions</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md">Schedule</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto px-md">
+<button class="w-full bg-surface-container-high border-2 border-outline-variant rounded-full py-3 flex items-center justify-center gap-2 text-on-background hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col md:ml-64 p-margin-mobile md:p-margin-desktop gap-lg h-[calc(100vh-80px)] md:h-screen overflow-y-auto">
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 shrink-0">
+<div>
+<h1 class="font-headline-xl text-headline-lg-mobile md:text-headline-xl text-primary-fixed mb-2">Judge Dashboard</h1>
+<p class="font-body-md text-on-surface-variant">List of submitted projects.</p>
+</div>
+<div class="flex gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-container rounded-full border border-surface-variant pl-12 pr-6 py-3 text-on-background focus:outline-none focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed w-full md:w-64 transition-all" placeholder="Search projects..." type="text"/>
+</div>
+</div>
+</header>
+<div class="flex flex-col lg:flex-row gap-lg flex-1 min-h-0">
+<!-- Project List -->
+<section class="flex-1 flex flex-col gap-sm overflow-y-auto pr-2 custom-scrollbar">
+<!-- Active Project Card -->
+<div class="glass-panel rounded-xl p-6 flex flex-col sm:flex-row gap-6 items-center cursor-pointer relative border-primary-fixed scale-[1.01] transition-transform">
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-12 bg-primary-fixed rounded-r-full"></div>
+<div class="w-32 h-32 rounded-lg bg-surface-container overflow-hidden shrink-0 border border-surface-variant relative">
+<img class="w-full h-full object-cover" data-alt="A 3D rendered, cute, squishy turtle character character named Lucky Turtle. The turtle is a vibrant lime green with bright yellow accents, designed in a highly tactile, digital physicalness style typical of high-end ToyCad software. It has a smooth, frosted glass-like texture on its shell, sitting on a dark grey pedestal. The lighting is studio quality, creating soft highlights and deep shadows against an obsidian background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWWc8BIxXOZGiiqbzgvfHBjvK022d5TcjvfU3vvOhmem8LF2jxxKg9Yq2suBSHHDUbd_RcXqT1tWzQKWUxdRS6602ufZdna5GNyx3S3uShYiX_sSQlGdV2B_CtfQQ5MFzEpafN2K3cp_VDhixaY-ZM_19OZfI4PCdK0pxlHzOgl_6M9HYkkFlEFAjY66YBxVDggoag57pnmOFTop9Mo7V1IGh68dyTV5vqWaG973GBU0zKKIvhC6wR1g"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-lg text-headline-lg text-primary-fixed">Lucky Turtle</h3>
+<span class="bg-surface-variant text-on-surface-variant text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Pending</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-4">A tactile, digital-physical companion toy designed with high-fidelity glassmorphic elements and satisfying squishy mechanics.</p>
+<div class="flex gap-2">
+<span class="glass-panel px-3 py-1 rounded-full text-xs text-secondary-fixed">#3DModeling</span>
+<span class="glass-panel px-3 py-1 rounded-full text-xs text-secondary-fixed">#CharacterDesign</span>
+</div>
+</div>
+</div>
+<!-- Inactive Project Card 1 -->
+<div class="glass-panel rounded-xl p-6 flex flex-col sm:flex-row gap-6 items-center cursor-pointer hover:border-outline-variant hover:bg-surface-container-high/50 transition-all opacity-80 hover:opacity-100">
+<div class="w-24 h-24 rounded-lg bg-surface-container overflow-hidden shrink-0 border border-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A 3D rendered, stylized pig character holding a miniature skateboard. The character is a soft, fleshy pink with bright blue accents, exhibiting a premium, digital physicalness aesthetic typical of a creative ToyCad environment. The texture is smooth and slightly matte. It sits against a dark obsidian background with professional studio lighting highlighting its curved forms." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD9qpH7D96KlWs0GxeSu4qgK6sdr-3m0ZDDAQtWKtQhCO4UqLPmrlE-_f80haDXSKAoo4-YJ__DaP_XRwlOaxkDEa1KX2NN55n3bC7IquvgA7bkp1fG8HTIAqLEcuN2k0jnHpP-Jckb2tCmO1PnZdcw3Sc0gKJpkxkkXdNcHpRoteJlVHh5AW4g6FokB8FmYViZA8FrJ9Wla7GYmqJMAfpC2WPJ7OezVvkT9nObwNFM2SJ9n7yEwviWw"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-lg font-bold text-on-background">Pig and Skate</h3>
+</div>
+<p class="font-body-md text-sm text-on-surface-variant mb-3 line-clamp-2">An action-oriented vinyl toy concept featuring dynamic posing and modular accessory attachments.</p>
+<div class="flex gap-2">
+<span class="bg-surface-container px-2 py-1 rounded-full text-xs text-on-surface-variant border border-surface-variant">Team Alpha</span>
+</div>
+</div>
+</div>
+<!-- Inactive Project Card 2 -->
+<div class="glass-panel rounded-xl p-6 flex flex-col sm:flex-row gap-6 items-center cursor-pointer hover:border-outline-variant hover:bg-surface-container-high/50 transition-all opacity-80 hover:opacity-100">
+<div class="w-24 h-24 rounded-lg bg-surface-container overflow-hidden shrink-0 border border-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A 3D rendered miniature fox character designed in a bold, neo-brutalist style. The fox is a vibrant, aggressive orange with stark white and black accents. It has slightly sharper, geometric edges compared to typical soft toys, emphasizing a high-contrast, premium digital toolset aesthetic. It is rendered against an obsidian black background with intense, localized lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzAd_Oo3jn4zdOwFeeylonYMGSiNDd_uUWfRQvn-eFKta_j5tivtsweQDsO9Mt6Tv4jnfgPTvkYALmCOVOW2sj5EGpY4pVMSujR2v-1IoevZo10T6pvqy2XbQabePGG1v0jPPyDiH4n54uVMExps0MknygNnPKOA1hUETqnAnIfmTzYJ4arar2F_FUhJwRUYXmEA4-cu9pbZHi2N5fQIxu1bRMBdemUpUxPUz9wfTGcEjpZLRbb1cagg"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-lg font-bold text-on-background">Little Fox</h3>
+</div>
+<p class="font-body-md text-sm text-on-surface-variant mb-3 line-clamp-2">A geometric, neo-brutalist interpretation of a woodland creature intended for desktop display.</p>
+<div class="flex gap-2">
+<span class="bg-surface-container px-2 py-1 rounded-full text-xs text-on-surface-variant border border-surface-variant">Solo Builder</span>
+</div>
+</div>
+</div>
+<!-- Inactive Project Card 3 -->
+<div class="glass-panel rounded-xl p-6 flex flex-col sm:flex-row gap-6 items-center cursor-pointer hover:border-outline-variant hover:bg-surface-container-high/50 transition-all opacity-80 hover:opacity-100">
+<div class="w-24 h-24 rounded-lg bg-surface-container overflow-hidden shrink-0 border border-surface-variant flex items-center justify-center bg-surface-container-high">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant">architecture</span>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-lg font-bold text-on-background">Zebra Setup</h3>
+</div>
+<p class="font-body-md text-sm text-on-surface-variant mb-3 line-clamp-2">Modular environment diorama built for the zebra figure.</p>
+</div>
+</div>
+</section>
+<!-- Evaluation Panel (Right Side) -->
+<aside class="w-full lg:w-[400px] glass-panel rounded-xl flex flex-col overflow-hidden shrink-0">
+<div class="p-6 border-b border-surface-variant bg-surface-container-highest/30">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-fixed text-sm font-bold">star</span>
+</div>
+<h2 class="font-headline-lg text-2xl text-primary-fixed">Evaluation</h2>
+</div>
+<p class="font-body-md text-sm text-on-surface-variant">Scoring for: <strong class="text-on-background">Lucky Turtle</strong></p>
+</div>
+<div class="p-6 flex-1 overflow-y-auto flex flex-col gap-6">
+<!-- Criteria 1 -->
+<div>
+<div class="flex justify-between items-end mb-4">
+<label class="font-body-md font-bold text-on-background">Score 1-10</label>
+<span class="text-secondary-fixed font-headline-lg text-xl">8<span class="text-on-surface-variant text-sm">/10</span></span>
+</div>
+<input class="w-full" max="10" min="1" type="range" value="8"/>
+<div class="flex justify-between mt-2 text-xs text-on-surface-variant font-label-sm uppercase">
+<span>Poor</span>
+<span>Excellent</span>
+</div>
+</div>
+<!-- Feedback Textarea -->
+<div class="mt-4 flex-1 flex flex-col">
+<label class="font-body-md font-bold text-on-background mb-3">Feedback text</label>
+<textarea class="flex-1 w-full bg-surface-container border border-surface-variant rounded-xl p-4 text-on-background font-body-md resize-none focus:outline-none focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed" placeholder="Leave your notes for the team here..."></textarea>
+</div>
+</div>
+<div class="p-6 border-t border-surface-variant bg-surface-container-highest/50">
+<button class="w-full bg-primary-fixed text-on-primary-fixed font-headline-lg text-lg py-4 rounded-full border-[3px] border-[#131313] hover:bg-primary-fixed-dim transition-colors shadow-[0_4px_0_#131313] active:translate-y-[4px] active:shadow-none flex items-center justify-center gap-2">
+                        Submit Score
+                        <span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</aside>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface-dim/90 backdrop-blur-xl border-t-2 border-outline-variant shadow-lg rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-sm text-label-sm mt-1">Teams</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full p-2 scale-110 shadow-[0_2px_0_#131313]" href="#">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-label-sm text-[10px] font-bold mt-1">Drafts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-sm text-label-sm mt-1">Events</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple script to update range slider visuals (optional for this static demo, but adds polish if interacted with)
+        const sliders = document.querySelectorAll('input[type="range"]');
+        sliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const val = e.target.value;
+                const display = e.target.previousElementSibling.querySelector('.font-headline-lg');
+                display.innerHTML = `${val}<span class="text-on-surface-variant text-sm">/10</span>`;
+            });
+        });
+    </script>
+</body></html>

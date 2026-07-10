@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ToyCad Hack - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Space+Grotesk:wght@600&amp;family=Hanken+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#2a2a2a",
+                      "tertiary-container": "#e2e2e2",
+                      "on-tertiary-container": "#636565",
+                      "surface-dim": "#131313",
+                      "outline": "#969179",
+                      "inverse-primary": "#695f00",
+                      "primary-fixed-dim": "#dbc90a",
+                      "primary-fixed": "#f9e534",
+                      "surface-variant": "#353534",
+                      "on-tertiary": "#2f3131",
+                      "on-secondary": "#283500",
+                      "secondary": "#ffffff",
+                      "primary-container": "#f9e534",
+                      "tertiary-fixed": "#e2e2e2",
+                      "surface-container-highest": "#353534",
+                      "on-primary-fixed": "#201c00",
+                      "on-surface-variant": "#cdc7ac",
+                      "secondary-container": "#c3f400",
+                      "surface-container-low": "#1c1b1b",
+                      "primary": "#ffffff",
+                      "background": "#131313",
+                      "surface-bright": "#3a3939",
+                      "surface-tint": "#dbc90a",
+                      "on-surface": "#e5e2e1",
+                      "surface-container": "#201f1f",
+                      "tertiary-fixed-dim": "#c6c6c7",
+                      "on-secondary-container": "#556d00",
+                      "on-primary": "#363100",
+                      "on-secondary-fixed": "#161e00",
+                      "tertiary": "#ffffff",
+                      "error-container": "#93000a",
+                      "on-primary-container": "#706500",
+                      "surface": "#131313",
+                      "on-tertiary-fixed": "#1a1c1c",
+                      "surface-container-lowest": "#0e0e0e",
+                      "inverse-surface": "#e5e2e1",
+                      "error": "#ffb4ab",
+                      "inverse-on-surface": "#313030",
+                      "on-primary-fixed-variant": "#4f4800",
+                      "secondary-fixed-dim": "#abd600",
+                      "outline-variant": "#4a4733",
+                      "secondary-fixed": "#c3f400",
+                      "on-background": "#e5e2e1",
+                      "on-error": "#690005",
+                      "on-error-container": "#ffdad6",
+                      "on-secondary-fixed-variant": "#3c4d00",
+                      "on-tertiary-fixed-variant": "#454747"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "24px",
+                      "xl": "64px",
+                      "sm": "12px",
+                      "gutter": "20px",
+                      "margin-desktop": "40px",
+                      "lg": "48px",
+                      "base": "8px",
+                      "margin-mobile": "16px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-sm": [
+                              "Space Grotesk"
+                      ],
+                      "headline-xl": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg-mobile": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .cad-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(150, 145, 121, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(150, 145, 121, 0.05) 1px, transparent 1px);
+        }
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex items-center justify-center relative overflow-hidden font-body-md text-body-md cad-grid">
+<!-- Decorative ambient shapes (Neo-brutalist / Glassmorphic mix) -->
+<div class="absolute top-10 left-10 w-64 h-64 bg-primary-fixed/20 rounded-full blur-[100px] z-0"></div>
+<div class="absolute bottom-10 right-10 w-96 h-96 bg-secondary-fixed/10 rounded-full blur-[120px] z-0"></div>
+<div class="w-full max-w-[1200px] px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-lg items-center relative z-10 h-full py-xl">
+<!-- Graphic / Branding Section (Hidden on small screens to focus on transaction) -->
+<div class="hidden md:flex flex-col justify-center items-center h-full relative">
+<div class="w-full aspect-square rounded-xl overflow-hidden border-2 border-outline-variant relative bg-surface-container-lowest">
+<img class="w-full h-full object-cover object-center absolute inset-0 mix-blend-lighten" data-alt="A high-fidelity 3D rendering of a glossy, stylized toy character floating against a dark, minimalist CAD grid background. The character features extremely rounded forms, vibrant yellow and acid green accents, and a smooth, squishy texture reminiscent of premium vinyl toys. The lighting is dramatic and studio-quality, casting sharp highlights and deep shadows to emphasize 3D volume. The overall mood is playful, modern, and highly tactile, fitting a professional creative software environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzpizDDNxxoaC5_wofVNVustghxzRNKPbjZ9E-OQGOWaOo7pDhswqNdJm7mCcLOewrW7-PYSvA3R0tZeq3DmbHzZi6mqHwLWuJXX7wda0iCLz5u-9TK2W5CmqNAtZp8pDsU0z0reEAoJ3KbIZU8WMzwqQu8TIZKZVOnC4af091cVUGMY5zmPxv_isoyMp1m1I0jyeKvEcafej2XyjRjEkUXfmhgKjc4OZp_ppTXwKVToPTp5G9EzqG-Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+</div>
+</div>
+<!-- Login Card (Glassmorphic Neo-Brutalist) -->
+<div class="flex flex-col items-center justify-center w-full max-w-md mx-auto">
+<div class="bg-surface-dim/80 backdrop-blur-2xl border-2 border-outline-variant rounded-xl p-md md:p-xl w-full shadow-2xl relative overflow-hidden">
+<!-- Inner subtle glow -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-1 bg-gradient-to-r from-transparent via-primary-fixed/30 to-transparent"></div>
+<div class="text-center mb-xl">
+<div class="flex items-center justify-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-primary-fixed text-[40px]" data-icon="toys" data-weight="fill">toys</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-primary-fixed font-black tracking-tighter">ToyCad<br/>Hack</h1>
+<p class="text-on-surface-variant mt-xs">Build the future, one stud at a time.</p>
+</div>
+<form class="space-y-md">
+<!-- Username Input -->
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface ml-4 block uppercase" for="username">Username</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">person</span>
+<input class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-4 pl-12 pr-4 focus:outline-none focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed transition-colors placeholder:text-surface-variant font-body-md text-body-md" id="username" placeholder="Username" type="text"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface ml-4 block uppercase" for="password">Password</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">key</span>
+<input class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-4 pl-12 pr-4 focus:outline-none focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed transition-colors placeholder:text-surface-variant font-body-md text-body-md" id="password" placeholder="Password" type="password"/>
+</div>
+</div>
+<div class="flex items-center justify-between px-4 pb-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="form-checkbox w-5 h-5 rounded-[4px] border-2 border-surface-variant bg-surface-container-lowest text-primary-fixed focus:ring-primary-fixed focus:ring-offset-background group-hover:border-primary-fixed transition-colors" type="checkbox"/>
+<span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-on-surface transition-colors">Remember me</span>
+</label>
+<a class="font-label-sm text-label-sm text-primary-fixed hover:text-white transition-colors" href="#">Forgot Key?</a>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full bg-primary-fixed text-on-primary-fixed font-headline-lg text-[20px] font-bold py-4 rounded-full border-[3px] border-surface-container-lowest hover:bg-white hover:-translate-y-1 hover:shadow-[0_4px_0_0_#1c1b1b] active:translate-y-0 active:shadow-none transition-all flex items-center justify-center gap-2" type="submit">
+<span>Sign In</span>
+<span class="material-symbols-outlined text-[24px]">arrow_forward</span>
+</button>
+</form>
+<div class="mt-lg text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                        Don't have an ID? <a class="text-secondary-fixed hover:text-white transition-colors underline decoration-2 underline-offset-4" href="#">Join the Hackathon</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

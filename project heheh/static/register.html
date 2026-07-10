@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ToyCad Hack - Join the Hackathon</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Space+Grotesk:wght@600&amp;family=Hanken+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#2a2a2a",
+                      "tertiary-container": "#e2e2e2",
+                      "on-tertiary-container": "#636565",
+                      "surface-dim": "#131313",
+                      "outline": "#969179",
+                      "inverse-primary": "#695f00",
+                      "primary-fixed-dim": "#dbc90a",
+                      "primary-fixed": "#f9e534",
+                      "surface-variant": "#353534",
+                      "on-tertiary": "#2f3131",
+                      "on-secondary": "#283500",
+                      "secondary": "#ffffff",
+                      "primary-container": "#f9e534",
+                      "tertiary-fixed": "#e2e2e2",
+                      "surface-container-highest": "#353534",
+                      "on-primary-fixed": "#201c00",
+                      "on-surface-variant": "#cdc7ac",
+                      "secondary-container": "#c3f400",
+                      "surface-container-low": "#1c1b1b",
+                      "primary": "#ffffff",
+                      "background": "#131313",
+                      "surface-bright": "#3a3939",
+                      "surface-tint": "#dbc90a",
+                      "on-surface": "#e5e2e1",
+                      "surface-container": "#201f1f",
+                      "tertiary-fixed-dim": "#c6c6c7",
+                      "on-secondary-container": "#556d00",
+                      "on-primary": "#363100",
+                      "on-secondary-fixed": "#161e00",
+                      "tertiary": "#ffffff",
+                      "error-container": "#93000a",
+                      "on-primary-container": "#706500",
+                      "surface": "#131313",
+                      "on-tertiary-fixed": "#1a1c1c",
+                      "surface-container-lowest": "#0e0e0e",
+                      "inverse-surface": "#e5e2e1",
+                      "error": "#ffb4ab",
+                      "inverse-on-surface": "#313030",
+                      "on-primary-fixed-variant": "#4f4800",
+                      "secondary-fixed-dim": "#abd600",
+                      "outline-variant": "#4a4733",
+                      "secondary-fixed": "#c3f400",
+                      "on-background": "#e5e2e1",
+                      "on-error": "#690005",
+                      "on-error-container": "#ffdad6",
+                      "on-secondary-fixed-variant": "#3c4d00",
+                      "on-tertiary-fixed-variant": "#454747"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "24px",
+                      "xl": "64px",
+                      "sm": "12px",
+                      "gutter": "20px",
+                      "margin-desktop": "40px",
+                      "lg": "48px",
+                      "base": "8px",
+                      "margin-mobile": "16px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "label-sm": ["Space Grotesk"],
+                      "headline-xl": ["Plus Jakarta Sans"],
+                      "body-md": ["Hanken Grotesk"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .cad-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(150, 145, 121, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(150, 145, 121, 0.05) 1px, transparent 1px);
+        }
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex items-center justify-center relative overflow-hidden font-body-md text-body-md cad-grid">
+<!-- Decorative ambient shapes -->
+<div class="absolute top-10 right-10 w-64 h-64 bg-secondary-fixed/20 rounded-full blur-[100px] z-0"></div>
+<div class="absolute bottom-10 left-10 w-96 h-96 bg-primary-fixed/10 rounded-full blur-[120px] z-0"></div>
+
+<div class="w-full max-w-[1200px] px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-lg items-center relative z-10 h-full py-xl">
+
+<!-- Graphic / Branding Section -->
+<div class="hidden md:flex flex-col justify-center items-center h-full relative">
+<div class="w-full aspect-square rounded-xl overflow-hidden border-2 border-outline-variant relative bg-surface-container-lowest">
+<img class="w-full h-full object-cover object-center absolute inset-0 mix-blend-lighten" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzpizDDNxxoaC5_wofVNVustghxzRNKPbjZ9E-OQGOWaOo7pDhswqNdJm7mCcLOewrW7-PYSvA3R0tZeq3DmbHzZi6mqHwLWuJXX7wda0iCLz5u-9TK2W5CmqNAtZp8pDsU0z0reEAoJ3KbIZU8WMzwqQu8TIZKZVOnC4af091cVUGMY5zmPxv_isoyMp1m1I0jyeKvEcafej2XyjRjEkUXfmhgKjc4OZp_ppTXwKVToPTp5G9EzqG-Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+</div>
+</div>
+
+<!-- Registration Card -->
+<div class="flex flex-col items-center justify-center w-full max-w-md mx-auto">
+<div class="bg-surface-dim/80 backdrop-blur-2xl border-2 border-outline-variant rounded-xl p-md md:p-xl w-full shadow-2xl relative overflow-hidden">
+<!-- Inner subtle glow -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-1 bg-gradient-to-r from-transparent via-secondary-fixed/30 to-transparent"></div>
+
+<div class="text-center mb-lg">
+<div class="flex items-center justify-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-secondary-fixed text-[40px]">rocket_launch</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-secondary-fixed font-black tracking-tighter">Join the<br/>Hackathon</h1>
+<p class="text-on-surface-variant mt-xs">Create your builder ID and start creating.</p>
+</div>
+
+<form id="register-form" class="space-y-md">
+<!-- Username Input -->
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface ml-4 block uppercase" for="reg-username">Username</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">person</span>
+<input class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-4 pl-12 pr-4 focus:outline-none focus:border-secondary-fixed focus:ring-1 focus:ring-secondary-fixed transition-colors placeholder:text-surface-variant font-body-md text-body-md" id="reg-username" placeholder="Choose a username" type="text"/>
+</div>
+</div>
+
+<!-- Password Input -->
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface ml-4 block uppercase" for="reg-password">Password</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">key</span>
+<input class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-4 pl-12 pr-4 focus:outline-none focus:border-secondary-fixed focus:ring-1 focus:ring-secondary-fixed transition-colors placeholder:text-surface-variant font-body-md text-body-md" id="reg-password" placeholder="Create a password" type="password"/>
+</div>
+</div>
+
+<!-- Role Selection -->
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface ml-4 block uppercase">Role</label>
+<div class="flex gap-3 px-2">
+<button type="button" data-role="participant" class="role-btn flex-1 py-3 px-4 rounded-full border-2 border-secondary-fixed bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98]">
+<span class="material-symbols-outlined text-[16px] align-middle mr-1">build</span>Participant
+</button>
+<button type="button" data-role="judge" class="role-btn flex-1 py-3 px-4 rounded-full border-2 border-surface-variant bg-transparent text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] hover:border-primary-fixed">
+<span class="material-symbols-outlined text-[16px] align-middle mr-1">gavel</span>Judge
+</button>
+</div>
+</div>
+
+<!-- Team Name (only for participants) -->
+<div id="team-field" class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface ml-4 block uppercase" for="reg-team">Team Name</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">group</span>
+<input class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-4 pl-12 pr-4 focus:outline-none focus:border-secondary-fixed focus:ring-1 focus:ring-secondary-fixed transition-colors placeholder:text-surface-variant font-body-md text-body-md" id="reg-team" placeholder="Create or join a team" type="text"/>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant/60 ml-4">Enter an existing team name to join, or a new name to create one.</p>
+</div>
+
+<!-- Error/Success message area -->
+<div id="register-feedback" class="hidden px-4 py-3 rounded-full font-label-sm text-label-sm text-center"></div>
+
+<!-- Register Button -->
+<button id="register-btn" class="w-full bg-secondary-fixed text-on-secondary-fixed font-headline-lg text-[20px] font-bold py-4 rounded-full border-[3px] border-surface-container-lowest hover:bg-secondary-fixed-dim hover:-translate-y-1 hover:shadow-[0_4px_0_0_#1c1b1b] active:translate-y-0 active:shadow-none transition-all flex items-center justify-center gap-2" type="submit">
+<span>Create Account</span>
+<span class="material-symbols-outlined text-[24px]">arrow_forward</span>
+</button>
+</form>
+
+<div class="mt-lg text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+    Already have an ID? <a class="text-primary-fixed hover:text-white transition-colors underline decoration-2 underline-offset-4" href="login.html">Sign In</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const API = window.location.origin;
+let selectedRole = 'participant';
+
+// Role toggle buttons
+document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        selectedRole = btn.dataset.role;
+        
+        // Update button styles
+        document.querySelectorAll('.role-btn').forEach(b => {
+            if (b.dataset.role === selectedRole) {
+                b.className = 'role-btn flex-1 py-3 px-4 rounded-full border-2 border-secondary-fixed bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98]';
+            } else {
+                b.className = 'role-btn flex-1 py-3 px-4 rounded-full border-2 border-surface-variant bg-transparent text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] hover:border-primary-fixed';
+            }
+        });
+
+        // Show/hide team field
+        const teamField = document.getElementById('team-field');
+        if (selectedRole === 'participant') {
+            teamField.style.display = '';
+        } else {
+            teamField.style.display = 'none';
+        }
+    });
+});
+
+// Register form submission
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const feedbackEl = document.getElementById('register-feedback');
+    const btn = document.getElementById('register-btn');
+    feedbackEl.classList.add('hidden');
+
+    const username = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const teamName = document.getElementById('reg-team').value.trim();
+
+    // Validation
+    if (!username || !password) {
+        feedbackEl.textContent = 'Please fill in both username and password.';
+        feedbackEl.className = 'px-4 py-3 rounded-full font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        return;
+    }
+
+    if (password.length < 4) {
+        feedbackEl.textContent = 'Password must be at least 4 characters.';
+        feedbackEl.className = 'px-4 py-3 rounded-full font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        return;
+    }
+
+    if (selectedRole === 'participant' && !teamName) {
+        feedbackEl.textContent = 'Please enter a team name to create or join.';
+        feedbackEl.className = 'px-4 py-3 rounded-full font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.querySelector('span:first-child').textContent = 'Creating...';
+
+    try {
+        const body = {
+            username,
+            password,
+            role: selectedRole,
+        };
+        if (selectedRole === 'participant' && teamName) {
+            body.team_name = teamName;
+        }
+
+        const res = await fetch(`${API}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || 'Registration failed');
+        }
+
+        const data = await res.json();
+        
+        feedbackEl.innerHTML = '✓ Account created! Redirecting to login...';
+        feedbackEl.className = 'px-4 py-3 rounded-full font-label-sm text-label-sm text-center bg-secondary-fixed/20 border border-secondary-fixed/30 text-secondary-fixed';
+        feedbackEl.classList.remove('hidden');
+
+        // Redirect to login after short delay
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1500);
+
+    } catch (err) {
+        feedbackEl.textContent = err.message;
+        feedbackEl.className = 'px-4 py-3 rounded-full font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.querySelector('span:first-child').textContent = 'Create Account';
+    }
+});
+</script>
+</body></html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ToyCad Admin - Teams</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Hanken+Grotesk:wght@500&amp;family=Space+Grotesk:wght@600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config from Brand Anchors -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#2a2a2a",
+                    "tertiary-container": "#e2e2e2",
+                    "on-tertiary-container": "#636565",
+                    "surface-dim": "#131313",
+                    "outline": "#969179",
+                    "inverse-primary": "#695f00",
+                    "primary-fixed-dim": "#dbc90a",
+                    "primary-fixed": "#f9e534",
+                    "surface-variant": "#353534",
+                    "on-tertiary": "#2f3131",
+                    "on-secondary": "#283500",
+                    "secondary": "#ffffff",
+                    "primary-container": "#f9e534",
+                    "tertiary-fixed": "#e2e2e2",
+                    "surface-container-highest": "#353534",
+                    "on-primary-fixed": "#201c00",
+                    "on-surface-variant": "#cdc7ac",
+                    "secondary-container": "#c3f400",
+                    "surface-container-low": "#1c1b1b",
+                    "primary": "#ffffff",
+                    "background": "#131313",
+                    "surface-bright": "#3a3939",
+                    "surface-tint": "#dbc90a",
+                    "on-surface": "#e5e2e1",
+                    "surface-container": "#201f1f",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-secondary-container": "#556d00",
+                    "on-primary": "#363100",
+                    "on-secondary-fixed": "#161e00",
+                    "tertiary": "#ffffff",
+                    "error-container": "#93000a",
+                    "on-primary-container": "#706500",
+                    "surface": "#131313",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-surface": "#e5e2e1",
+                    "error": "#ffb4ab",
+                    "inverse-on-surface": "#313030",
+                    "on-primary-fixed-variant": "#4f4800",
+                    "secondary-fixed-dim": "#abd600",
+                    "outline-variant": "#4a4733",
+                    "secondary-fixed": "#c3f400",
+                    "on-background": "#e5e2e1",
+                    "on-error": "#690005",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#3c4d00",
+                    "on-tertiary-fixed-variant": "#454747"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "xl": "64px",
+                    "sm": "12px",
+                    "gutter": "20px",
+                    "margin-desktop": "40px",
+                    "lg": "48px",
+                    "base": "8px",
+                    "margin-mobile": "16px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "label-sm": ["Space Grotesk"],
+                    "headline-xl": ["Plus Jakarta Sans"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-surface-container-lowest dark:bg-surface-container-lowest h-screen w-64 rounded-r-xl border-r-2 border-outline-variant shadow-md fixed left-0 top-0 flex flex-col z-40 py-lg hidden md:flex">
+<!-- Header -->
+<div class="px-md mb-xl flex items-center gap-sm">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-fixed shrink-0">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A stylized 3D rendered avatar of a cute, rounded character with vibrant yellow and green accents, set against a dark studio background, embodying a high-energy creative aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh2Hzr5Ftbe1b-0IdmZm5ePHbVvqD6Xa6H4a06yLBI_24OnblYeB0dndkvjhWOrGHGnto8IU7KIZD0NukKmH4KgoaI-8-WLd9-9XJc1_xlTrE9yEuhpNnKR0OfIz-DvpVWL7h9dAX9PZCd2kAf9Jca41jc5lRSkM-FU786UMHLdVuNfMMIUjI6B7LNmJEvUW4BknIglKDLmdyuHHomdyKmSuIbjOlru-6SnT4gSWl-s_LAXJ3TJiHmgA"/>
+</div>
+<div>
+<h1 class="font-headline-lg text-[24px] text-primary-fixed dark:text-primary-fixed tracking-tight leading-none">ToyCad</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mt-1 tracking-widest">Admin</p>
+</div>
+</div>
+<!-- CTA -->
+<div class="px-md mb-lg">
+<button class="w-full bg-primary-fixed text-on-primary-fixed font-headline-lg text-[18px] py-3 px-4 rounded-full border-[3px] border-black shadow-[0_4px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined font-bold">add</span>
+                New Project
+            </button>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto px-2 space-y-2">
+<!-- Dashboard (Inactive) -->
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<!-- Teams (Active Intent) -->
+<a class="bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+                Teams
+            </a>
+<!-- Submissions (Inactive) -->
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+                Submissions
+            </a>
+<!-- Schedule (Inactive) -->
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                Schedule
+            </a>
+<!-- Settings (Inactive) -->
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+<!-- Footer Links -->
+<div class="px-2 mt-auto pt-lg border-t border-surface-variant/50">
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">help</span>
+                Help
+            </a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop min-w-0 flex flex-col gap-lg">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+<div>
+<h2 class="font-headline-xl text-headline-xl-mobile md:text-headline-xl text-on-surface mb-2">Registered Teams</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Manage hackathon participants and submissions.</p>
+</div>
+<div class="relative w-full md:w-auto">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full md:w-64 bg-surface-container border border-surface-variant rounded-full py-3 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed transition-all font-body-md text-body-md outline-none" placeholder="Search teams..." type="text"/>
+</div>
+</header>
+<!-- Stats Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-high rounded-xl p-md border-2 border-surface-variant relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[80px] text-primary-fixed" style="font-variation-settings: 'FILL' 1;">group</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2 relative z-10">Total Teams</p>
+<p class="font-headline-xl text-headline-xl text-primary-fixed relative z-10">142</p>
+<div class="mt-4 flex items-center gap-2 text-secondary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+12 this week</span>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-container-high rounded-xl p-md border-2 border-surface-variant relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[80px] text-secondary-fixed" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2 relative z-10">Participants</p>
+<p class="font-headline-xl text-headline-xl text-secondary-fixed relative z-10">487</p>
+<div class="mt-4 flex items-center gap-2 text-primary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+<span>High activity</span>
+</div>
+</div>
+</section>
+<!-- Data Table (Custom Layout for extreme rounded glass rows) -->
+<section class="flex flex-col gap-sm">
+<!-- Table Header -->
+<div class="hidden md:grid grid-cols-12 gap-4 px-md py-2 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest border-b border-surface-variant mb-2">
+<div class="col-span-3">Team Name</div>
+<div class="col-span-3">Members</div>
+<div class="col-span-2">Track</div>
+<div class="col-span-2">GitHub</div>
+<div class="col-span-2 text-right">Status</div>
+</div>
+<!-- Table Body (Rows) -->
+<div class="flex flex-col gap-3">
+<!-- Row 1 -->
+<div class="bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-[32px] p-md grid grid-cols-1 md:grid-cols-12 gap-4 items-center transition-all group shadow-[0_4px_0_0_rgba(0,0,0,0.2)]">
+<div class="col-span-3 flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container border-2 border-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary-fixed">architecture</span>
+</div>
+<div>
+<h3 class="font-headline-lg text-[20px] text-on-surface m-0 leading-none">PolyMenders</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">ID: #8921</p>
+</div>
+</div>
+<div class="col-span-3 flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] object-cover" data-alt="A 3D stylized avatar profile picture, high contrast vibrant lighting, dark background, creative tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8LSJoUpuzoyXXoWdhw6dz-0O5GzWCA-xQGxKGpWacO2fC65aIo7UEnIr6fACc1Q2pnoG7vpH0cLok0wZNW3N3CG0b4KF5xv82b2D6Gn8OfXsEGUbAEGkmLxQc7w-8jT5VkuFF_UlO_wcueutg9lr6qOj5HSDWf08qYYJ1z914l4wJqPDAENQgmFd8OrPqZgs2ShoLkNJqdNvvuQr2J-SXAIul9yNWIu1g9Ovweq4Ltnis4316iU_9ZA"/>
+<img class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] object-cover" data-alt="A 3D stylized avatar profile picture, bright neon green accents, dark background, playful expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1jZ-AMja50MXsIJJpEe0F8_NQXGdqtRPbCuLrAyz0IS0Hf9sr280oIZTy8QYanTID7PCgw-lnY5unKwWynq1pd9q7-GX48-SDb03FBgsrm5be-OuQvP-l2ucWXhRdFgL_7Y2Jjf9vNUJbrbOhX-j6K8H6pbuC5nJ5r5HXYWN0oTTyn9cbR4t3HXymUkiYvBkOU5xS83qdSWLHLnynsEjpi8WdUaicQyR7V4CDEhGOUvLOEpL50p9P7g"/>
+<img class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] object-cover" data-alt="A 3D stylized avatar profile picture, geometric glasses, deep yellow tones, minimal dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0E8UZTCuNvbKuX2blrldq01smsrfR7n9S_hKKNARouhBxiTzlDCPQNbsptGa8w4IaAI9fr8JSffg17sVGp8GPfmEHCbl6pkd5MrjYthl0LHBcwkD2FLBtzC_xxwVPJMM4_MnizGpyi0MfGKUXR3cb9sElLgGkZphgr-e-huPdLMvZ6nu6ZN_LOKtUp-0utkHaOsuqIYcel4ZBd7DU0GQPefP1ayAa5Pa8x_X4se3m8D6AjS2KqnmMRg"/>
+<div class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] bg-surface-variant flex items-center justify-center font-label-sm text-label-sm text-on-surface">+1</div>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center px-3 py-1 rounded-full border border-outline-variant bg-surface-container font-label-sm text-label-sm text-on-surface">Toy Design</span>
+</div>
+<div class="col-span-2">
+<a class="inline-flex items-center gap-1 text-on-surface-variant hover:text-primary-fixed transition-colors font-body-md text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">link</span>
+                            repo/poly
+                        </a>
+</div>
+<div class="col-span-2 flex justify-end">
+<span class="inline-flex items-center px-4 py-2 rounded-full bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm border border-secondary-fixed/30 gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+                            Submitted
+                        </span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-[32px] p-md grid grid-cols-1 md:grid-cols-12 gap-4 items-center transition-all group shadow-[0_4px_0_0_rgba(0,0,0,0.2)]">
+<div class="col-span-3 flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container border-2 border-outline-variant flex items-center justify-center shrink-0 group-hover:border-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary-fixed">widgets</span>
+</div>
+<div>
+<h3 class="font-headline-lg text-[20px] text-on-surface m-0 leading-none">BrickHax</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">ID: #8922</p>
+</div>
+</div>
+<div class="col-span-3 flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] object-cover" data-alt="A 3D stylized avatar profile picture, industrial grunge style mixed with vibrant yellow, dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxSAEaqjsFGrtlHiO8tuzTijOW3QYoC6-y4rl2B4lYCG0eFKxKBNm9W_DyZzqoJN4zexTdtmgUPVT1Bw0VKZDYe3_8JBt2KMn_dnR5Bk2yqA3SdQ9LlaSSdvJ9UBkU2Sp7vbMmgQxWF6uQmQR4bT8Upfd994q8YJpl3ZVE78p3E9F1L002TcJ977TKbbeaf0vcwdR1sotX6IMw1-RzuXR-Cl4JOJdgGFvpIfwYk4bHIoXKXRBKY2GbhQ"/>
+<img class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] object-cover" data-alt="A 3D stylized avatar profile picture, wearing a VR headset, glowing green elements, dark space." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlN-IVSy_GQs3qLj2onv2jVRD3MZZptMi-U-Vcmow8WpSX_pbw2y768wC5m6kh8RvgxWm7mw54fvG7782kXwJrBmbJYZ5HO8MHoiACuxRHGCw7LXHaJUr1mAW1wne5x0u1OAuW72oUGNztjjZqQob1FBQkF3_YAXBghMOhIcgc3wdHtwIPZ9EUOy9Y_z8yz0V-MiUaVempqbeHY82rPWRSQ3E_zg0KV02CJLkjpQllDC4Mq3wpbPzdPw"/>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center px-3 py-1 rounded-full border border-outline-variant bg-surface-container font-label-sm text-label-sm text-on-surface">Game Mod</span>
+</div>
+<div class="col-span-2">
+<a class="inline-flex items-center gap-1 text-on-surface-variant hover:text-primary-fixed transition-colors font-body-md text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">link</span>
+                            repo/bhax
+                        </a>
+</div>
+<div class="col-span-2 flex justify-end">
+<span class="inline-flex items-center px-4 py-2 rounded-full bg-surface-variant text-on-surface-variant font-label-sm text-label-sm border border-outline-variant gap-2">
+<span class="w-2 h-2 rounded-full bg-on-surface-variant"></span>
+                            Pending
+                        </span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-[32px] p-md grid grid-cols-1 md:grid-cols-12 gap-4 items-center transition-all group shadow-[0_4px_0_0_rgba(0,0,0,0.2)]">
+<div class="col-span-3 flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container border-2 border-secondary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary-fixed">smart_toy</span>
+</div>
+<div>
+<h3 class="font-headline-lg text-[20px] text-on-surface m-0 leading-none">MechaMinds</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">ID: #8925</p>
+</div>
+</div>
+<div class="col-span-3 flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] object-cover" data-alt="A 3D stylized avatar profile picture, robotic theme, sleek chrome with neon green lights, dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDil8PurM17xn-7AO_0tBsTbUDqdAvDNJI8i7SXUCBePtwSBBBRra0e516zaHfNoz_YVMNkM8omQ610ZcT0rkJC0PKoDqpjSNbi1qo4OAk66CNnTsfXY6qGz-NYUnBZHngabfQljQQEWQOMAFi9-fRyQElT2ZrwM_AFAk9ZM88j9rJ-rEVtAxJntU2dRBxEEoPxCYD80w0q_IIft9BC-LeTl2D2E2peiEZuoxeBMd019xrZTgEkr8B9eQ"/>
+<img class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] object-cover" data-alt="A 3D stylized avatar profile picture, cybernetic eye detail, deep shadows with sharp yellow highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD42Jt3QE7u9I9T4_Ip9iU0UDPGVzL-6VVTqtEKAaHMYBivKVHTA7e987b28ZUYYk4uySEWJq9nWxCS4iALQDK0aWsRXhAKZEHsDkUX9PAApLl2xnwNtw3zOpeszclCc1aIKcZeuiHCr-w1G1eGFumP1ezN7KHFjiLuwILnweIdK1ONoXdNtq753VwDVMTDVc19YJHG2dmjKX3j00O3vGM3wfvCkgs5FIKU9utsPf17bl5d15w5HYE86A"/>
+<img class="w-10 h-10 rounded-full border-2 border-[#1a1a1a] object-cover" data-alt="A 3D stylized avatar profile picture, abstract geometric face, minimalist, dark mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAGziqUuLqOv_A773J3VS6X_u3YziYVvQObLafGAFYtoew9DAE99_iT1AToQwc1lTFUvZG1VBPmCNb-wRSgaDX4rhBWBXpbNfBjyLKCe7HLJn9nJEymtn8mlRh-LzGyJ3nLYsIlV0yz3H1XjiHXbQJ4MkLa0Q0u4O9hK_xCFdkZmx9bjIYd4Jowa5X9S7qPrde80YPmgXUOj7FCzNiY74gC1BojUhH3OpcKP5TLfcrf0ageB1sxn5v4A"/>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center px-3 py-1 rounded-full border border-outline-variant bg-surface-container font-label-sm text-label-sm text-on-surface">Robotics</span>
+</div>
+<div class="col-span-2">
+<a class="inline-flex items-center gap-1 text-on-surface-variant hover:text-primary-fixed transition-colors font-body-md text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">link</span>
+                            repo/mecha
+                        </a>
+</div>
+<div class="col-span-2 flex justify-end">
+<span class="inline-flex items-center px-4 py-2 rounded-full bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm border border-secondary-fixed/30 gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+                            Submitted
+                        </span>
+</div>
+</div>
+</div>
+<!-- Pagination / Load More -->
+<div class="mt-md flex justify-center">
+<button class="bg-surface-container hover:bg-surface-variant text-on-surface font-label-sm text-label-sm uppercase tracking-widest py-3 px-8 rounded-full border border-outline-variant transition-colors">
+                    Load More Teams
+                </button>
+</div>
+</section>
+</main>
+</body></html>

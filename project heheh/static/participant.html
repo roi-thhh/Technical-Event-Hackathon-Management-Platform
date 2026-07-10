@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ToyCad Hackathon - Participant Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&amp;family=Space+Grotesk:wght@600&amp;family=Hanken+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#e2e2e2",
+                        "on-tertiary-container": "#636565",
+                        "surface-dim": "#131313",
+                        "outline": "#969179",
+                        "inverse-primary": "#695f00",
+                        "primary-fixed-dim": "#dbc90a",
+                        "primary-fixed": "#f9e534",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary": "#283500",
+                        "secondary": "#ffffff",
+                        "primary-container": "#f9e534",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#353534",
+                        "on-primary-fixed": "#201c00",
+                        "on-surface-variant": "#cdc7ac",
+                        "secondary-container": "#c3f400",
+                        "surface-container-low": "#1c1b1b",
+                        "primary": "#ffffff",
+                        "background": "#131313",
+                        "surface-bright": "#3a3939",
+                        "surface-tint": "#dbc90a",
+                        "on-surface": "#e5e2e1",
+                        "surface-container": "#201f1f",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary-container": "#556d00",
+                        "on-primary": "#363100",
+                        "on-secondary-fixed": "#161e00",
+                        "tertiary": "#ffffff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#706500",
+                        "surface": "#131313",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-surface": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed-variant": "#4f4800",
+                        "secondary-fixed-dim": "#abd600",
+                        "outline-variant": "#4a4733",
+                        "secondary-fixed": "#c3f400",
+                        "on-background": "#e5e2e1",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3c4d00",
+                        "on-tertiary-fixed-variant": "#454747"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "md": "24px",
+                        "xl": "64px",
+                        "sm": "12px",
+                        "gutter": "20px",
+                        "margin-desktop": "40px",
+                        "lg": "48px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "xs": "4px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Space Grotesk"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["32px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-sm": ["12px", { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "800" }],
+                        "body-md": ["16px", { lineHeight: "1.6", fontWeight: "500" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "1.2", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen w-screen overflow-hidden flex selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Desktop Side Navigation -->
+<aside class="hidden md:flex flex-col bg-surface-container-lowest h-screen w-64 rounded-r-xl border-r-2 border-outline-variant shadow-md fixed left-0 top-0 z-40 py-lg">
+<div class="px-md mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-primary-fixed tracking-tighter">ToyCreator</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-xs uppercase">Pro Builder</p>
+</div>
+<nav class="flex-1 flex flex-col gap-sm">
+<!-- Active Nav Item: Dashboard -->
+<a class="bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-sm text-label-sm">Teams</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+<span class="font-label-sm text-label-sm">Submissions</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm">Settings</span>
+</a>
+</nav>
+<div class="px-md mt-auto">
+<button class="w-full bg-primary-container text-on-primary-container rounded-full py-3 font-label-sm text-label-sm hover:scale-95 transition-transform border-2 border-transparent">
+                New Project
+            </button>
+</div>
+<div class="mt-lg flex flex-col gap-sm">
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-sm text-label-sm">Help</span>
+</a>
+<a id="logout-link" class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all cursor-pointer">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-sm text-label-sm">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface-dim/90 backdrop-blur-xl rounded-t-lg border-t-2 border-outline-variant shadow-lg">
+<!-- Active Nav Item: Home -->
+<a class="flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full p-2 scale-110 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-sm text-label-sm mt-1">Teams</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-label-sm text-label-sm mt-1">Drafts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-sm text-label-sm mt-1">Events</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<!-- Main Canvas Area -->
+<main class="flex-1 md:ml-64 relative overflow-y-auto pb-24 md:pb-0 h-full w-full">
+<!-- 3D Environment Background Wrapper -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute inset-0 grid-bg opacity-30"></div>
+<!-- Decorative abstract 3D blurry blob -->
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-fixed rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse"></div>
+<div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary-fixed rounded-full mix-blend-screen filter blur-[120px] opacity-10"></div>
+</div>
+<div class="relative z-10 min-h-full flex flex-col items-center justify-center p-margin-mobile md:p-margin-desktop gap-md">
+<!-- Contextual Status Indicators -->
+<div class="flex flex-wrap justify-center gap-sm mb-sm w-full max-w-2xl">
+<div class="bg-surface-container-high border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="font-label-sm text-label-sm text-on-surface">12h 45m Remaining</span>
+</div>
+<div id="status-badge" class="bg-surface-container-high border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span id="status-text" class="font-label-sm text-label-sm text-on-surface">Submission Open</span>
+</div>
+</div>
+<!-- Central Glassmorphic Submission Form -->
+<div class="w-full max-w-2xl bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high shadow-2xl relative overflow-hidden group">
+<!-- Subtle inner top highlight for glass effect -->
+<div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+<div class="p-md md:p-xl flex flex-col gap-lg">
+<!-- Header -->
+<div class="text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-lowest border-2 border-outline-variant mb-4 relative">
+<span class="material-symbols-outlined text-3xl text-secondary-fixed">rocket_launch</span>
+</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-primary-fixed mb-2">Deploy Your Toy</h2>
+<p class="text-on-surface-variant font-body-md">Submit your final hackathon project details below. Ensure your repository is public.</p>
+</div>
+<!-- Form Fields -->
+<form id="submit-form" class="flex flex-col gap-md">
+<!-- Repository URL Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="repo-url">
+<span class="material-symbols-outlined text-[16px]">link</span>
+                                GitHub repository link
+                            </label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md placeholder-on-surface-variant/50 focus:border-primary-fixed focus:ring-0 transition-colors outline-none h-[60px]" id="repo-url" placeholder="https://github.com/your-username/toy-project" type="url"/>
+</div>
+</div>
+<!-- Feedback message -->
+<div id="submit-feedback" class="hidden px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center"></div>
+<!-- Submit Action -->
+<div class="mt-4 pt-md border-t border-surface-container-highest">
+<button id="submit-btn" class="w-full bg-secondary-fixed text-on-secondary-fixed rounded-2xl py-4 px-8 font-headline-lg-mobile font-bold border-2 border-surface-container-lowest shadow-[0_6px_0_0_#0e0e0e] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#0e0e0e] active:translate-y-[6px] active:shadow-none transition-all flex items-center justify-center gap-3" type="button">
+<span>Submit Project</span>
+<span class="material-symbols-outlined font-bold text-2xl">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+<!-- Decorative footer text -->
+<p class="font-label-sm text-label-sm text-on-surface-variant/50 mt-4 text-center max-w-md">
+                Submissions are final once reviewed by judges. Make sure your repository is public and includes a README.
+            </p>
+</div>
+</main>
+
+<script>
+const API = window.location.origin;
+
+// Auth guard
+if (!sessionStorage.getItem('role') || sessionStorage.getItem('role') !== 'participant') {
+    window.location.href = '/static/login.html';
+}
+
+// Logout
+document.getElementById('logout-link').addEventListener('click', () => {
+    sessionStorage.clear();
+    window.location.href = '/static/login.html';
+});
+
+// Submit project
+document.getElementById('submit-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('submit-btn');
+    const feedbackEl = document.getElementById('submit-feedback');
+    const githubLink = document.getElementById('repo-url').value.trim();
+    const teamId = parseInt(sessionStorage.getItem('team_id'));
+
+    feedbackEl.classList.add('hidden');
+
+    if (!githubLink) {
+        feedbackEl.textContent = 'Please enter a valid GitHub repository link.';
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        return;
+    }
+
+    if (!teamId) {
+        feedbackEl.textContent = 'No team assigned. Please contact an admin.';
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.querySelector('span:first-child').textContent = 'Submitting...';
+
+    try {
+        const res = await fetch(`${API}/participant/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ team_id: teamId, github_link: githubLink })
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || 'Submission failed');
+        }
+
+        feedbackEl.textContent = '✓ Project submitted successfully!';
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-secondary-fixed/20 border border-secondary-fixed/30 text-secondary-fixed';
+        feedbackEl.classList.remove('hidden');
+
+        // Update status badge
+        document.getElementById('status-text').textContent = 'Submitted ✓';
+
+        // Disable form
+        btn.querySelector('span:first-child').textContent = 'Submitted ✓';
+        document.getElementById('repo-url').disabled = true;
+
+    } catch (err) {
+        feedbackEl.textContent = err.message;
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.querySelector('span:first-child').textContent = 'Submit Project';
+    }
+});
+
+async function loadGrades() {
+    const teamId = sessionStorage.getItem('team_id');
+    if (!teamId || teamId === 'null') return;
+
+    try {
+        const res = await fetch(`${API}/participant/grades/${teamId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        if (data.published && data.evaluations.length > 0) {
+            // Display grades on the dashboard
+            const dashboard = document.querySelector('#submit-form').parentElement;
+            
+            let html = `<div class="mt-8 pt-6 border-t border-surface-container-highest">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary-fixed/20 border-2 border-secondary-fixed/50 mb-4 relative">
+                    <span class="material-symbols-outlined text-2xl text-secondary-fixed">emoji_events</span>
+                </div>
+                <h3 class="font-headline-lg text-primary-fixed mb-4">Your Results</h3>
+                <div class="flex flex-col gap-4">`;
+                
+            data.evaluations.forEach((ev, idx) => {
+                html += `
+                <div class="bg-surface-container border border-surface-variant rounded-xl p-4 flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <span class="font-label-sm uppercase text-on-surface-variant">Evaluation #${idx+1}</span>
+                        <span class="font-headline-lg text-secondary-fixed">${ev.score}<span class="text-on-surface-variant text-sm">/10</span></span>
+                    </div>
+                    <p class="font-body-md text-on-surface">"${ev.feedback}"</p>
+                </div>`;
+            });
+            
+            html += `</div></div>`;
+            dashboard.insertAdjacentHTML('beforeend', html);
+        }
+    } catch(err) {
+        console.error('Error fetching grades:', err);
+    }
+}
+
+// Call on load
+setTimeout(loadGrades, 500);
+
+</script>
+<script>
+// Load all teams for the teams tab
+async function loadAllTeams() {
+    try {
+        const res = await fetch(`${API}/teams`);
+        const data = await res.json();
+        const tabEl = document.getElementById('tab-teams');
+        if (!tabEl) return;
+        
+        tabEl.className = 'tab-content relative z-10 min-h-full flex flex-col p-8 w-full';
+        
+        if (data.teams.length === 0) {
+            tabEl.innerHTML = `<div class="text-center bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high p-12 w-full max-w-4xl mx-auto">
+                <h2 class="font-headline-lg text-on-surface mb-2">Registered Teams</h2>
+                <p class="text-on-surface-variant">No teams have registered yet.</p>
+            </div>`;
+            return;
+        }
+
+        let html = `<div class="w-full max-w-4xl mx-auto"><h2 class="font-headline-xl text-primary-fixed mb-6">Registered Teams</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+        data.teams.forEach(t => {
+            const statusColor = t.submission_status === 'submitted' ? 'text-secondary-fixed' : 'text-on-surface-variant';
+            html += `
+            <div class="glass-panel p-6 rounded-xl border border-surface-variant flex flex-col gap-2 bg-surface-container-highest/30 backdrop-blur-xl">
+                <h3 class="font-headline-lg text-xl text-on-background">${t.team_name}</h3>
+                <p class="font-label-sm uppercase ${statusColor}">Status: ${t.submission_status}</p>
+                <p class="font-body-md text-on-surface-variant truncate">Link: ${t.github_link || 'N/A'}</p>
+            </div>`;
+        });
+        html += `</div></div>`;
+        tabEl.innerHTML = html;
+
+    } catch(err) {
+        console.error(err);
+    }
+}
+</script>
+<script>
+
+// Tab switching logic
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('aside nav a, nav.md\\:hidden a');
+    const mainCanvas = document.querySelector('main');
+    
+    // Create tab contents if they don't exist
+    const tabs = ['submissions', 'schedule', 'settings', 'drafts', 'events', 'profile', 'help'];
+    
+    // Wrap existing content in a dashboard tab
+    const existingContent = Array.from(mainCanvas.children).filter(el => el.tagName !== 'SCRIPT');
+    const dashboardTab = document.createElement('div');
+    dashboardTab.id = 'tab-dashboard';
+    dashboardTab.className = 'tab-content';
+    existingContent.forEach(el => dashboardTab.appendChild(el));
+    mainCanvas.prepend(dashboardTab);
+
+    // Create an empty teams tab that will be populated by loadAllTeams()
+    const teamsTab = document.createElement('div');
+    teamsTab.id = 'tab-teams';
+    teamsTab.className = 'tab-content hidden';
+    mainCanvas.appendChild(teamsTab);
+
+    tabs.forEach(tab => {
+        const tabEl = document.createElement('div');
+        tabEl.id = `tab-${tab}`;
+        tabEl.className = 'tab-content hidden relative z-10 min-h-full flex flex-col items-center justify-center p-8';
+        tabEl.innerHTML = `
+            <div class="text-center bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high p-12 max-w-lg w-full shadow-2xl">
+                <span class="material-symbols-outlined text-6xl text-primary-fixed mb-4">construction</span>
+                <h2 class="font-headline-lg text-on-surface mb-2 capitalize">${tab}</h2>
+                <p class="text-on-surface-variant font-body-md">This section is currently under development. Please check back later.</p>
+            </div>
+        `;
+        mainCanvas.appendChild(tabEl);
+    });
+
+    const activeClassDesktop = 'bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200'.split(' ');
+    const inactiveClassDesktop = 'text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all'.split(' ');
+    
+    const activeClassMobile = 'flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full p-2 scale-110 transition-all'.split(' ');
+    const inactiveClassMobile = 'flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed'.split(' ');
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        const target = document.getElementById(`tab-${tabName}`);
+        if (target) {
+            target.classList.remove('hidden');
+        } else {
+            document.getElementById('tab-dashboard').classList.remove('hidden');
+        }
+
+        navLinks.forEach(link => {
+            const linkText = link.textContent.toLowerCase();
+            const isMatch = linkText.includes(tabName) || (tabName === 'dashboard' && linkText.includes('home'));
+            
+            const isDesktop = link.closest('aside') !== null;
+            
+            if (isDesktop) {
+                if (isMatch) {
+                    link.classList.remove(...inactiveClassDesktop);
+                    link.classList.add(...activeClassDesktop);
+                    // fix icon fill
+                    const icon = link.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+                } else {
+                    link.classList.remove(...activeClassDesktop);
+                    link.classList.add(...inactiveClassDesktop);
+                    const icon = link.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "normal";
+                }
+            } else {
+                if (isMatch) {
+                    link.classList.remove(...inactiveClassMobile);
+                    link.classList.add(...activeClassMobile);
+                    const icon = link.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+                } else {
+                    link.classList.remove(...activeClassMobile);
+                    link.classList.add(...inactiveClassMobile);
+                    const icon = link.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "normal";
+                }
+            }
+        });
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (link.id === 'logout-link') return;
+            e.preventDefault();
+            const linkText = link.textContent.trim().toLowerCase();
+            
+            let tabName = 'dashboard';
+            if (linkText.includes('teams')) tabName = 'teams';
+            else if (linkText.includes('submissions')) tabName = 'submissions';
+            else if (linkText.includes('schedule') || linkText.includes('events')) tabName = 'schedule';
+            else if (linkText.includes('settings')) tabName = 'settings';
+            else if (linkText.includes('drafts')) tabName = 'drafts';
+            else if (linkText.includes('profile')) tabName = 'profile';
+            else if (linkText.includes('help')) tabName = 'help';
+            
+            switchTab(tabName);
+            if (tabName === 'teams') loadAllTeams();
+        });
+    });
+
+    // Handle new project button
+    const newProjectBtn = document.querySelector('button');
+    if (newProjectBtn && newProjectBtn.textContent.toLowerCase().includes('new project')) {
+        newProjectBtn.addEventListener('click', () => {
+            switchTab('drafts'); // or some other tab
+        });
+    }
+});
+
+</script>
+</body></html>

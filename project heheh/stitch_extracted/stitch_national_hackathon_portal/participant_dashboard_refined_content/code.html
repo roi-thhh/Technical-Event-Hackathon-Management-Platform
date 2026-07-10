@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ToyCad Hackathon - Participant Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&amp;family=Space+Grotesk:wght@600&amp;family=Hanken+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#e2e2e2",
+                        "on-tertiary-container": "#636565",
+                        "surface-dim": "#131313",
+                        "outline": "#969179",
+                        "inverse-primary": "#695f00",
+                        "primary-fixed-dim": "#dbc90a",
+                        "primary-fixed": "#f9e534",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary": "#283500",
+                        "secondary": "#ffffff",
+                        "primary-container": "#f9e534",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#353534",
+                        "on-primary-fixed": "#201c00",
+                        "on-surface-variant": "#cdc7ac",
+                        "secondary-container": "#c3f400",
+                        "surface-container-low": "#1c1b1b",
+                        "primary": "#ffffff",
+                        "background": "#131313",
+                        "surface-bright": "#3a3939",
+                        "surface-tint": "#dbc90a",
+                        "on-surface": "#e5e2e1",
+                        "surface-container": "#201f1f",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary-container": "#556d00",
+                        "on-primary": "#363100",
+                        "on-secondary-fixed": "#161e00",
+                        "tertiary": "#ffffff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#706500",
+                        "surface": "#131313",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-surface": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed-variant": "#4f4800",
+                        "secondary-fixed-dim": "#abd600",
+                        "outline-variant": "#4a4733",
+                        "secondary-fixed": "#c3f400",
+                        "on-background": "#e5e2e1",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3c4d00",
+                        "on-tertiary-fixed-variant": "#454747"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "md": "24px",
+                        "xl": "64px",
+                        "sm": "12px",
+                        "gutter": "20px",
+                        "margin-desktop": "40px",
+                        "lg": "48px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "xs": "4px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Space Grotesk"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["32px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-sm": ["12px", { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "800" }],
+                        "body-md": ["16px", { lineHeight: "1.6", fontWeight: "500" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "1.2", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen w-screen overflow-hidden flex selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Desktop Side Navigation -->
+<aside class="hidden md:flex flex-col bg-surface-container-lowest h-screen w-64 rounded-r-xl border-r-2 border-outline-variant shadow-md fixed left-0 top-0 z-40 py-lg">
+<div class="px-md mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-primary-fixed tracking-tighter">ToyCreator</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-xs uppercase">Pro Builder</p>
+</div>
+<nav class="flex-1 flex flex-col gap-sm">
+<!-- Active Nav Item: Dashboard -->
+<a class="bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 Active: translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-sm text-label-sm">Teams</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+<span class="font-label-sm text-label-sm">Submissions</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm">Settings</span>
+</a>
+</nav>
+<div class="px-md mt-auto">
+<button class="w-full bg-primary-container text-on-primary-container rounded-full py-3 font-label-sm text-label-sm hover:scale-95 transition-transform border-2 border-transparent">
+                New Project
+            </button>
+</div>
+<div class="mt-lg flex flex-col gap-sm">
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-sm text-label-sm">Help</span>
+</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-sm text-label-sm">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface-dim/90 backdrop-blur-xl rounded-t-lg border-t-2 border-outline-variant shadow-lg">
+<!-- Active Nav Item: Home -->
+<a class="flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full p-2 scale-110 Active: scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-sm text-label-sm mt-1">Teams</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-label-sm text-label-sm mt-1">Drafts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-sm text-label-sm mt-1">Events</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<!-- Main Canvas Area -->
+<main class="flex-1 md:ml-64 relative overflow-y-auto pb-24 md:pb-0 h-full w-full">
+<!-- 3D Environment Background Wrapper -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute inset-0 grid-bg opacity-30"></div>
+<!-- Decorative abstract 3D blurry blob -->
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-fixed rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse"></div>
+<div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary-fixed rounded-full mix-blend-screen filter blur-[120px] opacity-10"></div>
+</div>
+<div class="relative z-10 min-h-full flex flex-col items-center justify-center p-margin-mobile md:p-margin-desktop gap-md">
+<!-- Contextual Status Indicators -->
+<div class="flex flex-wrap justify-center gap-sm mb-sm w-full max-w-2xl">
+<div class="bg-surface-container-high border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="font-label-sm text-label-sm text-on-surface">12h 45m Remaining</span>
+</div>
+<div class="bg-surface-container-high border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-label-sm text-label-sm text-on-surface">Submission Open</span>
+</div>
+</div>
+<!-- Central Glassmorphic Submission Form -->
+<div class="w-full max-w-2xl bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high shadow-2xl relative overflow-hidden group">
+<!-- Subtle inner top highlight for glass effect -->
+<div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+<div class="p-md md:p-xl flex flex-col gap-lg">
+<!-- Header -->
+<div class="text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-lowest border-2 border-outline-variant mb-4 relative">
+<span class="material-symbols-outlined text-3xl text-secondary-fixed">rocket_launch</span>
+</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-primary-fixed mb-2">Deploy Your Toy</h2>
+<p class="text-on-surface-variant font-body-md">Submit your final hackathon project details below. Ensure your repository is public.</p>
+</div>
+<!-- Form Fields -->
+<form class="flex flex-col gap-md">
+<!-- Repository URL Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="repo-url">
+<span class="material-symbols-outlined text-[16px]">link</span>
+                                GitHub repository link
+                            </label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md placeholder-on-surface-variant/50 focus:border-primary-fixed focus:ring-0 transition-colors outline-none h-[60px]" id="repo-url" placeholder="https://github.com/your-username/toy-project" type="url"/>
+</div>
+</div>
+<!-- Submit Action -->
+<div class="mt-4 pt-md border-t border-surface-container-highest">
+<button class="w-full bg-secondary-fixed text-on-secondary-fixed rounded-2xl py-4 px-8 font-headline-lg-mobile font-bold border-2 border-surface-container-lowest shadow-[0_6px_0_0_#0e0e0e] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#0e0e0e] active:translate-y-[6px] active:shadow-none transition-all flex items-center justify-center gap-3" type="button">
+<span>Submit Project</span>
+<span class="material-symbols-outlined font-bold text-2xl">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+<!-- Decorative footer text -->
+<p class="font-label-sm text-label-sm text-on-surface-variant/50 mt-4 text-center max-w-md">
+                Submissions are final once reviewed by judges. Make sure your repository is public and includes a README.
+            </p>
+</div>
+</main>
+</body></html>

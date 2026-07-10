@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ToyCad Admin - Teams</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Hanken+Grotesk:wght@500&amp;family=Space+Grotesk:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#2a2a2a",
+                    "tertiary-container": "#e2e2e2",
+                    "on-tertiary-container": "#636565",
+                    "surface-dim": "#131313",
+                    "outline": "#969179",
+                    "inverse-primary": "#695f00",
+                    "primary-fixed-dim": "#dbc90a",
+                    "primary-fixed": "#f9e534",
+                    "surface-variant": "#353534",
+                    "on-tertiary": "#2f3131",
+                    "on-secondary": "#283500",
+                    "secondary": "#ffffff",
+                    "primary-container": "#f9e534",
+                    "tertiary-fixed": "#e2e2e2",
+                    "surface-container-highest": "#353534",
+                    "on-primary-fixed": "#201c00",
+                    "on-surface-variant": "#cdc7ac",
+                    "secondary-container": "#c3f400",
+                    "surface-container-low": "#1c1b1b",
+                    "primary": "#ffffff",
+                    "background": "#131313",
+                    "surface-bright": "#3a3939",
+                    "surface-tint": "#dbc90a",
+                    "on-surface": "#e5e2e1",
+                    "surface-container": "#201f1f",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-secondary-container": "#556d00",
+                    "on-primary": "#363100",
+                    "on-secondary-fixed": "#161e00",
+                    "tertiary": "#ffffff",
+                    "error-container": "#93000a",
+                    "on-primary-container": "#706500",
+                    "surface": "#131313",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-surface": "#e5e2e1",
+                    "error": "#ffb4ab",
+                    "inverse-on-surface": "#313030",
+                    "on-primary-fixed-variant": "#4f4800",
+                    "secondary-fixed-dim": "#abd600",
+                    "outline-variant": "#4a4733",
+                    "secondary-fixed": "#c3f400",
+                    "on-background": "#e5e2e1",
+                    "on-error": "#690005",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#3c4d00",
+                    "on-tertiary-fixed-variant": "#454747"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "xl": "64px",
+                    "sm": "12px",
+                    "gutter": "20px",
+                    "margin-desktop": "40px",
+                    "lg": "48px",
+                    "base": "8px",
+                    "margin-mobile": "16px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "label-sm": ["Space Grotesk"],
+                    "headline-xl": ["Plus Jakarta Sans"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-lowest dark:bg-surface-container-lowest h-screen w-64 rounded-r-xl border-r-2 border-outline-variant shadow-md fixed left-0 top-0 flex flex-col z-40 py-lg hidden md:flex">
+<!-- Header -->
+<div class="px-md mb-xl flex items-center gap-sm">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-fixed shrink-0">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh2Hzr5Ftbe1b-0IdmZm5ePHbVvqD6Xa6H4a06yLBI_24OnblYeB0dndkvjhWOrGHGnto8IU7KIZD0NukKmH4KgoaI-8-WLd9-9XJc1_xlTrE9yEuhpNnKR0OfIz-DvpVWL7h9dAX9PZCd2kAf9Jca41jc5lRSkM-FU786UMHLdVuNfMMIUjI6B7LNmJEvUW4BknIglKDLmdyuHHomdyKmSuIbjOlru-6SnT4gSWl-s_LAXJ3TJiHmgA"/>
+</div>
+<div>
+<h1 class="font-headline-lg text-[24px] text-primary-fixed dark:text-primary-fixed tracking-tight leading-none">ToyCad</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mt-1 tracking-widest">Admin</p>
+</div>
+</div>
+<!-- CTA -->
+<div class="px-md mb-lg">
+<button class="w-full bg-primary-fixed text-on-primary-fixed font-headline-lg text-[18px] py-3 px-4 rounded-full border-[3px] border-black shadow-[0_4px_0_0_#000] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined font-bold">add</span>
+                New Project
+            </button>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto px-2 space-y-2">
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+                Teams
+            </a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+                Submissions
+            </a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                Schedule
+            </a>
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+<!-- Footer Links -->
+<div class="px-2 mt-auto pt-lg border-t border-surface-variant/50">
+<a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">help</span>
+                Help
+            </a>
+<a id="logout-link" class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md cursor-pointer">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop min-w-0 flex flex-col gap-lg">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+<div>
+<h2 class="font-headline-xl text-headline-xl-mobile md:text-headline-xl text-on-surface mb-2">Registered Teams</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Manage hackathon participants and submissions.</p>
+</div>
+<div class="relative w-full md:w-auto">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input id="search-input" class="w-full md:w-64 bg-surface-container border border-surface-variant rounded-full py-3 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed transition-all font-body-md text-body-md outline-none" placeholder="Search teams..." type="text"/>
+</div>
+</header>
+<!-- Stats Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-high rounded-xl p-md border-2 border-surface-variant relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[80px] text-primary-fixed" style="font-variation-settings: 'FILL' 1;">group</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2 relative z-10">Total Teams</p>
+<p id="stat-total-teams" class="font-headline-xl text-headline-xl text-primary-fixed relative z-10">—</p>
+<div class="mt-4 flex items-center gap-2 text-secondary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>Live data</span>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-container-high rounded-xl p-md border-2 border-surface-variant relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[80px] text-secondary-fixed" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2 relative z-10">Submitted</p>
+<p id="stat-submitted" class="font-headline-xl text-headline-xl text-secondary-fixed relative z-10">—</p>
+<div class="mt-4 flex items-center gap-2 text-primary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+<span>Active tracking</span>
+</div>
+</div>
+</section>
+<!-- Data Table -->
+<section class="flex flex-col gap-sm">
+<!-- Table Header -->
+<div class="hidden md:grid grid-cols-12 gap-4 px-md py-2 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest border-b border-surface-variant mb-2">
+<div class="col-span-4">Team Name</div>
+<div class="col-span-4">GitHub</div>
+<div class="col-span-4 text-right">Status</div>
+</div>
+<!-- Table Body (Rows) — dynamically populated -->
+<div id="teams-table" class="flex flex-col gap-3">
+<!-- Loading placeholder -->
+<div class="text-center py-xl text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-4xl mb-2 block animate-spin">progress_activity</span>
+Loading teams...
+</div>
+</div>
+</section>
+</main>
+
+<script>
+const API = window.location.origin;
+
+// Auth guard
+if (!sessionStorage.getItem('role') || sessionStorage.getItem('role') !== 'admin') {
+    window.location.href = '/static/login.html';
+}
+
+// Logout
+document.getElementById('logout-link').addEventListener('click', () => {
+    sessionStorage.clear();
+    window.location.href = '/static/login.html';
+});
+
+// Icons for teams
+const teamIcons = ['architecture', 'widgets', 'smart_toy', 'extension', 'category', 'view_in_ar'];
+
+function renderTeamRow(team, index) {
+    const icon = teamIcons[index % teamIcons.length];
+    const isSubmitted = team.submission_status === 'submitted';
+
+    const statusBadge = isSubmitted
+        ? `<span class="inline-flex items-center px-4 py-2 rounded-full bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm border border-secondary-fixed/30 gap-2">
+             <span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>Submitted
+           </span>`
+        : `<span class="inline-flex items-center px-4 py-2 rounded-full bg-surface-variant text-on-surface-variant font-label-sm text-label-sm border border-outline-variant gap-2">
+             <span class="w-2 h-2 rounded-full bg-on-surface-variant"></span>Pending
+           </span>`;
+
+    const githubDisplay = team.github_link
+        ? `<a class="inline-flex items-center gap-1 text-on-surface-variant hover:text-primary-fixed transition-colors font-body-md text-sm" href="${team.github_link}" target="_blank">
+             <span class="material-symbols-outlined text-[18px]">link</span>${team.github_link.replace('https://github.com/', '')}
+           </a>`
+        : `<span class="text-on-surface-variant/50 font-body-md text-sm">No link yet</span>`;
+
+    const borderColor = isSubmitted ? 'border-primary-fixed' : 'border-outline-variant';
+
+    return `
+    <div class="bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-[32px] p-md grid grid-cols-1 md:grid-cols-12 gap-4 items-center transition-all group shadow-[0_4px_0_0_rgba(0,0,0,0.2)]">
+      <div class="col-span-4 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-surface-container border-2 ${borderColor} flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-${isSubmitted ? 'primary-fixed' : 'on-surface-variant'}">${icon}</span>
+        </div>
+        <div>
+          <h3 class="font-headline-lg text-[20px] text-on-surface m-0 leading-none">${team.team_name}</h3>
+          <p class="font-label-sm text-label-sm text-on-surface-variant mt-1">ID: #${team.team_id}</p>
+        </div>
+      </div>
+      <div class="col-span-4">${githubDisplay}</div>
+      <div class="col-span-4 flex justify-end">${statusBadge}</div>
+    </div>`;
+}
+
+async function loadDashboard() {
+    try {
+        const res = await fetch(`${API}/admin/dashboard`);
+        const data = await res.json();
+        const teams = data.teams;
+
+        // Update stats
+        document.getElementById('stat-total-teams').textContent = teams.length;
+        document.getElementById('stat-submitted').textContent = teams.filter(t => t.submission_status === 'submitted').length;
+
+        // Render table
+        const tableEl = document.getElementById('teams-table');
+        if (teams.length === 0) {
+            tableEl.innerHTML = `<div class="text-center py-xl text-on-surface-variant font-body-md">
+              <span class="material-symbols-outlined text-4xl mb-2 block">inbox</span>No teams registered yet.
+            </div>`;
+        } else {
+            tableEl.innerHTML = teams.map((t, i) => renderTeamRow(t, i)).join('');
+        }
+
+        // Search filter
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = teams.filter(t => t.team_name.toLowerCase().includes(query));
+            tableEl.innerHTML = filtered.map((t, i) => renderTeamRow(t, i)).join('');
+        });
+
+    } catch (err) {
+        document.getElementById('teams-table').innerHTML = `<div class="text-center py-xl text-error font-body-md">
+          <span class="material-symbols-outlined text-4xl mb-2 block">error</span>Failed to load teams: ${err.message}
+        </div>`;
+    }
+}
+
+loadDashboard();
+</script>
+<script>
+
+// Tab switching logic
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('aside nav a, nav.md\\:hidden a');
+    const mainCanvas = document.querySelector('main');
+    
+    // Create tab contents if they don't exist
+    const tabs = ['teams', 'submissions', 'schedule', 'settings', 'drafts', 'events', 'profile', 'help'];
+    
+    // Wrap existing content in a dashboard tab
+    const existingContent = Array.from(mainCanvas.children).filter(el => el.tagName !== 'SCRIPT');
+    const dashboardTab = document.createElement('div');
+    dashboardTab.id = 'tab-dashboard';
+    dashboardTab.className = 'tab-content';
+    existingContent.forEach(el => dashboardTab.appendChild(el));
+    mainCanvas.prepend(dashboardTab);
+
+    tabs.forEach(tab => {
+        const tabEl = document.createElement('div');
+        tabEl.id = `tab-${tab}`;
+        tabEl.className = 'tab-content hidden relative z-10 min-h-full flex flex-col items-center justify-center p-8';
+        tabEl.innerHTML = `
+            <div class="text-center bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high p-12 max-w-lg w-full shadow-2xl">
+                <span class="material-symbols-outlined text-6xl text-primary-fixed mb-4">construction</span>
+                <h2 class="font-headline-lg text-on-surface mb-2 capitalize">${tab}</h2>
+                <p class="text-on-surface-variant font-body-md">This section is currently under development. Please check back later.</p>
+            </div>
+        `;
+        mainCanvas.appendChild(tabEl);
+    });
+
+    const activeClassDesktop = 'bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200'.split(' ');
+    const inactiveClassDesktop = 'text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all'.split(' ');
+    
+    const activeClassMobile = 'flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full p-2 scale-110 transition-all'.split(' ');
+    const inactiveClassMobile = 'flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed'.split(' ');
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        const target = document.getElementById(`tab-${tabName}`);
+        if (target) {
+            target.classList.remove('hidden');
+        } else {
+            document.getElementById('tab-dashboard').classList.remove('hidden');
+        }
+
+        navLinks.forEach(link => {
+            const linkText = link.textContent.toLowerCase();
+            const isMatch = linkText.includes(tabName) || (tabName === 'dashboard' && linkText.includes('home'));
+            
+            const isDesktop = link.closest('aside') !== null;
+            
+            if (isDesktop) {
+                if (isMatch) {
+                    link.classList.remove(...inactiveClassDesktop);
+                    link.classList.add(...activeClassDesktop);
+                    // fix icon fill
+                    const icon = link.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+                } else {
+                    link.classList.remove(...activeClassDesktop);
+                    link.classList.add(...inactiveClassDesktop);
+                    const icon = link.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "normal";
+                }
+            } else {
+                if (isMatch) {
+                    link.classList.remove(...inactiveClassMobile);
+                    link.classList.add(...activeClassMobile);
+                    const icon = link.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+                } else {
+                    link.classList.remove(...activeClassMobile);
+                    link.classList.add(...inactiveClassMobile);
+                    const icon = link.querySelector('.material-symbols-outlined');
+                    if (icon) icon.style.fontVariationSettings = "normal";
+                }
+            }
+        });
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (link.id === 'logout-link') return;
+            e.preventDefault();
+            const linkText = link.textContent.trim().toLowerCase();
+            
+            let tabName = 'dashboard';
+            if (linkText.includes('teams')) tabName = 'teams';
+            else if (linkText.includes('submissions')) tabName = 'submissions';
+            else if (linkText.includes('schedule') || linkText.includes('events')) tabName = 'schedule';
+            else if (linkText.includes('settings')) tabName = 'settings';
+            else if (linkText.includes('drafts')) tabName = 'drafts';
+            else if (linkText.includes('profile')) tabName = 'profile';
+            else if (linkText.includes('help')) tabName = 'help';
+            
+            switchTab(tabName);
+        });
+    });
+
+    // Handle new project button
+    const newProjectBtn = document.querySelector('button');
+    if (newProjectBtn && newProjectBtn.textContent.toLowerCase().includes('new project')) {
+        newProjectBtn.addEventListener('click', () => {
+            switchTab('drafts'); // or some other tab
+        });
+    }
+});
+
+</script>
+</body></html>

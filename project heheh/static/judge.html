@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Judge Dashboard - ToyCad Hack</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#e2e2e2",
+                        "on-tertiary-container": "#636565",
+                        "surface-dim": "#131313",
+                        "outline": "#969179",
+                        "inverse-primary": "#695f00",
+                        "primary-fixed-dim": "#dbc90a",
+                        "primary-fixed": "#f9e534",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary": "#283500",
+                        "secondary": "#ffffff",
+                        "primary-container": "#f9e534",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#353534",
+                        "on-primary-fixed": "#201c00",
+                        "on-surface-variant": "#cdc7ac",
+                        "secondary-container": "#c3f400",
+                        "surface-container-low": "#1c1b1b",
+                        "primary": "#ffffff",
+                        "background": "#131313",
+                        "surface-bright": "#3a3939",
+                        "surface-tint": "#dbc90a",
+                        "on-surface": "#e5e2e1",
+                        "surface-container": "#201f1f",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary-container": "#556d00",
+                        "on-primary": "#363100",
+                        "on-secondary-fixed": "#161e00",
+                        "tertiary": "#ffffff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#706500",
+                        "surface": "#131313",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-surface": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed-variant": "#4f4800",
+                        "secondary-fixed-dim": "#abd600",
+                        "outline-variant": "#4a4733",
+                        "secondary-fixed": "#c3f400",
+                        "on-background": "#e5e2e1",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3c4d00",
+                        "on-tertiary-fixed-variant": "#454747"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "xl": "64px",
+                        "sm": "12px",
+                        "gutter": "20px",
+                        "margin-desktop": "40px",
+                        "lg": "48px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Space Grotesk"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 2px solid #262626;
+        }
+
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+
+        /* Range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #f9e534;
+            cursor: pointer;
+            margin-top: -10px;
+            border: 2px solid #131313;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #353534;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background text-on-background min-h-screen font-body-md grid-bg selection:bg-primary-fixed selection:text-on-primary-fixed flex flex-col md:flex-row overflow-hidden">
+    <!-- Top Navigation (Mobile Only) -->
+    <header
+        class="md:hidden sticky top-0 z-50 bg-background/80 backdrop-blur-xl dark:bg-background/80 border-b-2 border-outline-variant flex justify-between items-center w-full px-margin-mobile py-base max-w-full">
+        <div class="text-headline-lg-mobile font-headline-lg font-black text-primary-fixed tracking-tighter">ToyCreator
+        </div>
+        <button class="w-10 h-10 rounded-full glass-panel flex items-center justify-center">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">menu</span>
+        </button>
+    </header>
+    <!-- Side Navigation (Desktop) -->
+    <nav
+        class="hidden md:flex bg-surface-container-lowest dark:bg-surface-container-lowest h-screen w-64 rounded-r-xl border-r-2 border-outline-variant shadow-md flex-col z-40 py-lg fixed left-0 top-0">
+        <div class="px-md mb-xl flex flex-col items-start gap-4">
+            <div class="font-headline-lg text-headline-lg text-primary-fixed leading-none">ToyCreator</div>
+            <div class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-widest">Judge Portal
+            </div>
+        </div>
+        <div class="flex-1 flex flex-col gap-2">
+            <a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all"
+                href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-body-md">Dashboard</span>
+            </a>
+            <a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all"
+                href="#">
+                <span class="material-symbols-outlined">group</span>
+                <span class="font-body-md">Teams</span>
+            </a>
+            <a class="bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200"
+                href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+                <span class="font-body-md">Submissions</span>
+            </a>
+            <a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all"
+                href="#">
+                <span class="material-symbols-outlined">calendar_today</span>
+                <span class="font-body-md">Schedule</span>
+            </a>
+            <a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all"
+                href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="font-body-md">Settings</span>
+            </a>
+        </div>
+        <div class="mt-auto px-md">
+            <button id="logout-link"
+                class="w-full bg-surface-container-high border-2 border-outline-variant rounded-full py-3 flex items-center justify-center gap-2 text-on-background hover:bg-surface-variant transition-colors cursor-pointer">
+                <span class="material-symbols-outlined">logout</span>
+                Logout
+            </button>
+        </div>
+    </nav>
+    <!-- Main Content Canvas -->
+    <main
+        class="flex-1 flex flex-col md:ml-64 p-margin-mobile md:p-margin-desktop gap-lg h-[calc(100vh-80px)] md:h-screen overflow-y-auto">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 shrink-0">
+            <div>
+                <h1 class="font-headline-xl text-headline-lg-mobile md:text-headline-xl text-primary-fixed mb-2">Judge
+                    Dashboard</h1>
+                <p class="font-body-md text-on-surface-variant">List of submitted projects. Select a team to evaluate.
+                </p>
+            </div>
+            <div class="flex gap-4">
+                <div class="relative">
+                    <span
+                        class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                    <input
+                        class="bg-surface-container rounded-full border border-surface-variant pl-12 pr-6 py-3 text-on-background focus:outline-none focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed w-full md:w-64 transition-all"
+                        placeholder="Search projects..." type="text" />
+                </div>
+            </div>
+        </header>
+        <div class="flex flex-col lg:flex-row gap-lg flex-1 min-h-0">
+            <!-- Project List -->
+            <section id="projects-list" class="flex-1 flex flex-col gap-sm overflow-y-auto pr-2">
+                <!-- Loading state -->
+                <div class="glass-panel rounded-xl p-6 text-center text-on-surface-variant">
+                    <span class="material-symbols-outlined text-4xl mb-2 block animate-spin">progress_activity</span>
+                    Loading submitted projects...
+                </div>
+            </section>
+            <!-- Evaluation Panel (Right Side) -->
+            <aside class="w-full lg:w-[400px] glass-panel rounded-xl flex flex-col overflow-hidden shrink-0">
+                <div class="p-6 border-b border-surface-variant bg-surface-container-highest/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-on-primary-fixed text-sm font-bold">star</span>
+                        </div>
+                        <h2 class="font-headline-lg text-2xl text-primary-fixed">Evaluation</h2>
+                    </div>
+                    <p class="font-body-md text-sm text-on-surface-variant">Scoring for: <strong id="eval-team-name"
+                            class="text-on-background">Select a team</strong></p>
+                </div>
+                <div class="p-6 flex-1 overflow-y-auto flex flex-col gap-6">
+                    <!-- Score slider -->
+                    <div>
+                        <div class="flex justify-between items-end mb-4">
+                            <label class="font-body-md font-bold text-on-background">Score 1-10</label>
+                            <span class="text-secondary-fixed font-headline-lg text-xl"><span
+                                    id="score-display">5</span><span
+                                    class="text-on-surface-variant text-sm">/10</span></span>
+                        </div>
+                        <input id="score-slider" class="w-full" max="10" min="1" type="range" value="5" />
+                        <div class="flex justify-between mt-2 text-xs text-on-surface-variant font-label-sm uppercase">
+                            <span>Poor</span>
+                            <span>Excellent</span>
+                        </div>
+                    </div>
+                    <!-- Feedback Textarea -->
+                    <div class="mt-4 flex-1 flex flex-col">
+                        <label class="font-body-md font-bold text-on-background mb-3">Feedback text</label>
+                        <textarea id="feedback-text"
+                            class="flex-1 w-full bg-surface-container border border-surface-variant rounded-xl p-4 text-on-background font-body-md resize-none focus:outline-none focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed"
+                            placeholder="Leave your notes for the team here..."></textarea>
+                    </div>
+                    <!-- Feedback message -->
+                    <div id="eval-feedback" class="hidden px-4 py-3 rounded-xl font-label-sm text-label-sm text-center">
+                    </div>
+                </div>
+                <div class="p-6 border-t border-surface-variant bg-surface-container-highest/50 flex flex-col gap-3">
+                    <button id="submit-eval-btn" disabled
+                        class="w-full bg-primary-fixed text-on-primary-fixed font-headline-lg text-lg py-4 rounded-full border-[3px] border-[#131313] hover:bg-primary-fixed-dim transition-colors shadow-[0_4px_0_#131313] active:translate-y-[4px] active:shadow-none flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Submit Score
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                    <button id="publish-grades-btn" disabled
+                        class="w-full bg-surface-container-high text-on-surface-variant font-headline-lg text-lg py-4 rounded-full border-[3px] border-outline-variant hover:bg-surface-variant transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Publish Grades
+                        <span class="material-symbols-outlined">campaign</span>
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <!-- Bottom Navigation (Mobile Only) -->
+    <nav
+        class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface-dim/90 backdrop-blur-xl border-t-2 border-outline-variant shadow-lg rounded-t-lg">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed"
+            href="#">
+            <span class="material-symbols-outlined">home</span>
+            <span class="font-label-sm text-label-sm mt-1">Home</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed"
+            href="#">
+            <span class="material-symbols-outlined">groups</span>
+            <span class="font-label-sm text-label-sm mt-1">Teams</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full p-2 scale-110 shadow-[0_2px_0_#131313]"
+            href="#">
+            <span class="material-symbols-outlined">architecture</span>
+            <span class="font-label-sm text-[10px] font-bold mt-1">Drafts</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed"
+            href="#">
+            <span class="material-symbols-outlined">event</span>
+            <span class="font-label-sm text-label-sm mt-1">Events</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed"
+            href="#">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-label-sm text-label-sm mt-1">Profile</span>
+        </a>
+    </nav>
+    <script>
+        const API = window.location.origin;
+        let selectedTeamId = null;
+
+        // Auth guard
+        if (!sessionStorage.getItem('role') || sessionStorage.getItem('role') !== 'judge') {
+            window.location.href = '/static/login.html';
+        }
+
+        // Logout
+        document.getElementById('logout-link').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = '/static/login.html';
+        });
+
+        // Score slider display
+        document.getElementById('score-slider').addEventListener('input', (e) => {
+            document.getElementById('score-display').textContent = e.target.value;
+        });
+
+        // Render a project card
+        function renderProjectCard(team, isActive) {
+            const activeClasses = isActive
+                ? 'border-primary-fixed scale-[1.01]'
+                : 'hover:border-outline-variant hover:bg-surface-container-high/50 opacity-80 hover:opacity-100';
+            const indicator = isActive
+                ? '<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-12 bg-primary-fixed rounded-r-full"></div>'
+                : '';
+            const sizeClass = isActive ? 'w-32 h-32' : 'w-24 h-24';
+            const titleClass = isActive ? 'font-headline-lg text-headline-lg text-primary-fixed' : 'font-body-md text-lg font-bold text-on-background';
+
+            const githubShort = team.github_link
+                ? team.github_link.replace('https://github.com/', '').substring(0, 30)
+                : 'No link';
+
+            return `
+    <div class="glass-panel rounded-xl p-6 flex flex-col sm:flex-row gap-6 items-center cursor-pointer relative ${activeClasses} transition-all"
+         data-team-id="${team.team_id}" data-team-name="${team.team_name}" onclick="selectTeam(${team.team_id}, '${team.team_name.replace(/'/g, "\\'")}')">
+      ${indicator}
+      <div class="${sizeClass} rounded-lg bg-surface-container overflow-hidden shrink-0 border border-surface-variant flex items-center justify-center bg-surface-container-high">
+        <span class="material-symbols-outlined text-4xl text-primary-fixed">smart_toy</span>
+      </div>
+      <div class="flex-1 flex flex-col justify-center">
+        <div class="flex justify-between items-start mb-1">
+          <h3 class="${titleClass}">${team.team_name}</h3>
+          ${isActive ? '<span class="bg-surface-variant text-on-surface-variant text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Review</span>' : ''}
+        </div>
+        <p class="font-body-md text-sm text-on-surface-variant mb-3 line-clamp-2">GitHub: ${githubShort}</p>
+        <div class="flex gap-2">
+          <span class="bg-surface-container px-2 py-1 rounded-full text-xs text-on-surface-variant border border-surface-variant">Team #${team.team_id}</span>
+        </div>
+      </div>
+    </div>`;
+        }
+
+        function selectTeam(teamId, teamName) {
+            selectedTeamId = teamId;
+            document.getElementById('eval-team-name').textContent = teamName;
+            document.getElementById('submit-eval-btn').disabled = false;
+            document.getElementById('publish-grades-btn').disabled = false;
+            document.getElementById('eval-feedback').classList.add('hidden');
+
+            // Re-render to update active state
+            const cards = document.querySelectorAll('[data-team-id]');
+            cards.forEach(card => {
+                const id = parseInt(card.dataset.teamId);
+                if (id === teamId) {
+                    card.className = card.className.replace('opacity-80 hover:opacity-100', '').replace('hover:border-outline-variant hover:bg-surface-container-high/50', '');
+                    card.classList.add('border-primary-fixed', 'scale-[1.01]');
+                } else {
+                    card.classList.remove('border-primary-fixed', 'scale-[1.01]');
+                    card.classList.add('opacity-80', 'hover:opacity-100');
+                }
+            });
+        }
+
+        // Load submitted projects
+        async function loadProjects() {
+            const listEl = document.getElementById('projects-list');
+            try {
+                const res = await fetch(`${API}/judge/dashboard`);
+                const data = await res.json();
+                const teams = data.teams;
+
+                if (teams.length === 0) {
+                    listEl.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-4xl mb-2 block">inbox</span>
+              No submitted projects to review yet.
+            </div>`;
+                    return;
+                }
+
+                // First team is selected by default
+                selectedTeamId = teams[0].team_id;
+                document.getElementById('eval-team-name').textContent = teams[0].team_name;
+                document.getElementById('submit-eval-btn').disabled = false;
+
+                listEl.innerHTML = teams.map((t, i) => renderProjectCard(t, i === 0)).join('');
+            } catch (err) {
+                listEl.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-error">
+          <span class="material-symbols-outlined text-4xl mb-2 block">error</span>
+          Failed to load projects: ${err.message}
+        </div>`;
+            }
+        }
+
+        // Submit evaluation
+        document.getElementById('submit-eval-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('submit-eval-btn');
+            const feedbackEl = document.getElementById('eval-feedback');
+            const score = parseInt(document.getElementById('score-slider').value);
+            const feedback = document.getElementById('feedback-text').value.trim();
+            const judgeId = parseInt(sessionStorage.getItem('user_id'));
+
+            if (!selectedTeamId) return;
+
+            if (!feedback) {
+                feedbackEl.textContent = 'Please provide feedback before submitting.';
+                feedbackEl.className = 'px-4 py-3 rounded-xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+                feedbackEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.querySelector('span:first-child') || (btn.childNodes[0].textContent = 'Submitting...');
+
+            try {
+                const res = await fetch(`${API}/judge/evaluate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        team_id: selectedTeamId,
+                        judge_id: judgeId,
+                        score: score,
+                        feedback: feedback
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Evaluation failed');
+                }
+
+                const data = await res.json();
+                feedbackEl.textContent = `✓ Evaluation #${data.evaluation_id} submitted! Score: ${score}/10`;
+                feedbackEl.className = 'px-4 py-3 rounded-xl font-label-sm text-label-sm text-center bg-secondary-fixed/20 border border-secondary-fixed/30 text-secondary-fixed';
+                feedbackEl.classList.remove('hidden');
+
+                // Reset form
+                document.getElementById('feedback-text').value = '';
+                document.getElementById('score-slider').value = 5;
+                document.getElementById('score-display').textContent = '5';
+                btn.disabled = false;
+
+            } catch (err) {
+                feedbackEl.textContent = err.message;
+                feedbackEl.className = 'px-4 py-3 rounded-xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+                feedbackEl.classList.remove('hidden');
+                btn.disabled = false;
+            }
+        });
+
+        document.getElementById('publish-grades-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('publish-grades-btn');
+            const feedbackEl = document.getElementById('eval-feedback');
+            const judgeId = parseInt(sessionStorage.getItem('user_id'));
+
+            if (!selectedTeamId) return;
+
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Publishing...';
+
+            try {
+                const res = await fetch(`${API}/judge/publish`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ team_id: selectedTeamId, judge_id: judgeId })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Publishing failed');
+                }
+
+                feedbackEl.textContent = `✓ Grades successfully published for this team!`;
+                feedbackEl.className = 'px-4 py-3 rounded-xl font-label-sm text-label-sm text-center bg-secondary-fixed/20 border border-secondary-fixed/30 text-secondary-fixed';
+                feedbackEl.classList.remove('hidden');
+
+            } catch (err) {
+                feedbackEl.textContent = err.message;
+                feedbackEl.className = 'px-4 py-3 rounded-xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+                feedbackEl.classList.remove('hidden');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        loadProjects();
+    </script>
+    <script>
+        // Load all teams for the teams tab
+        async function loadAllTeams() {
+            try {
+                const res = await fetch(`${API}/teams`);
+                const data = await res.json();
+                const tabEl = document.getElementById('tab-teams');
+                if (!tabEl) return;
+
+                tabEl.className = 'tab-content relative z-10 min-h-full flex flex-col p-8 w-full';
+
+                if (data.teams.length === 0) {
+                    tabEl.innerHTML = `<div class="text-center bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high p-12 w-full max-w-4xl mx-auto">
+                <h2 class="font-headline-lg text-on-surface mb-2">Registered Teams</h2>
+                <p class="text-on-surface-variant">No teams have registered yet.</p>
+            </div>`;
+                    return;
+                }
+
+                let html = `<div class="w-full max-w-4xl mx-auto"><h2 class="font-headline-xl text-primary-fixed mb-6">Registered Teams</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+                data.teams.forEach(t => {
+                    const statusColor = t.submission_status === 'submitted' ? 'text-secondary-fixed' : 'text-on-surface-variant';
+                    html += `
+            <div class="glass-panel p-6 rounded-xl border border-surface-variant flex flex-col gap-2">
+                <h3 class="font-headline-lg text-xl text-on-background">${t.team_name}</h3>
+                <p class="font-label-sm uppercase ${statusColor}">Status: ${t.submission_status}</p>
+                <p class="font-body-md text-on-surface-variant truncate">Link: ${t.github_link || 'N/A'}</p>
+            </div>`;
+                });
+                html += `</div></div>`;
+                tabEl.innerHTML = html;
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+    <script>
+
+        // Tab switching logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('aside nav a, nav.md\\:hidden a');
+            const mainCanvas = document.querySelector('main');
+
+            // Create tab contents if they don't exist
+            const tabs = ['submissions', 'schedule', 'settings', 'drafts', 'events', 'profile', 'help'];
+
+            // Wrap existing content in a dashboard tab
+            const existingContent = Array.from(mainCanvas.children).filter(el => el.tagName !== 'SCRIPT');
+            const dashboardTab = document.createElement('div');
+            dashboardTab.id = 'tab-dashboard';
+            dashboardTab.className = 'tab-content';
+            existingContent.forEach(el => dashboardTab.appendChild(el));
+            mainCanvas.prepend(dashboardTab);
+
+            // Create an empty teams tab that will be populated by loadAllTeams()
+            const teamsTab = document.createElement('div');
+            teamsTab.id = 'tab-teams';
+            teamsTab.className = 'tab-content hidden';
+            mainCanvas.appendChild(teamsTab);
+
+            tabs.forEach(tab => {
+                const tabEl = document.createElement('div');
+                tabEl.id = `tab-${tab}`;
+                tabEl.className = 'tab-content hidden relative z-10 min-h-full flex flex-col items-center justify-center p-8';
+                tabEl.innerHTML = `
+            <div class="text-center bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high p-12 max-w-lg w-full shadow-2xl">
+                <span class="material-symbols-outlined text-6xl text-primary-fixed mb-4">construction</span>
+                <h2 class="font-headline-lg text-on-surface mb-2 capitalize">${tab}</h2>
+                <p class="text-on-surface-variant font-body-md">This section is currently under development. Please check back later.</p>
+            </div>
+        `;
+                mainCanvas.appendChild(tabEl);
+            });
+
+            const activeClassDesktop = 'bg-primary-fixed text-on-primary-fixed rounded-full font-bold px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200'.split(' ');
+            const inactiveClassDesktop = 'text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all'.split(' ');
+
+            const activeClassMobile = 'flex flex-col items-center justify-center bg-secondary-fixed text-on-secondary-fixed rounded-full p-2 scale-110 transition-all'.split(' ');
+            const inactiveClassMobile = 'flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary-fixed'.split(' ');
+
+            function switchTab(tabName) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                const target = document.getElementById(`tab-${tabName}`);
+                if (target) {
+                    target.classList.remove('hidden');
+                } else {
+                    document.getElementById('tab-dashboard').classList.remove('hidden');
+                }
+
+                navLinks.forEach(link => {
+                    const linkText = link.textContent.toLowerCase();
+                    const isMatch = linkText.includes(tabName) || (tabName === 'dashboard' && linkText.includes('home'));
+
+                    const isDesktop = link.closest('aside') !== null;
+
+                    if (isDesktop) {
+                        if (isMatch) {
+                            link.classList.remove(...inactiveClassDesktop);
+                            link.classList.add(...activeClassDesktop);
+                            // fix icon fill
+                            const icon = link.querySelector('.material-symbols-outlined');
+                            if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+                        } else {
+                            link.classList.remove(...activeClassDesktop);
+                            link.classList.add(...inactiveClassDesktop);
+                            const icon = link.querySelector('.material-symbols-outlined');
+                            if (icon) icon.style.fontVariationSettings = "normal";
+                        }
+                    } else {
+                        if (isMatch) {
+                            link.classList.remove(...inactiveClassMobile);
+                            link.classList.add(...activeClassMobile);
+                            const icon = link.querySelector('.material-symbols-outlined');
+                            if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+                        } else {
+                            link.classList.remove(...activeClassMobile);
+                            link.classList.add(...inactiveClassMobile);
+                            const icon = link.querySelector('.material-symbols-outlined');
+                            if (icon) icon.style.fontVariationSettings = "normal";
+                        }
+                    }
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (link.id === 'logout-link') return;
+                    e.preventDefault();
+                    const linkText = link.textContent.trim().toLowerCase();
+
+                    let tabName = 'dashboard';
+                    if (linkText.includes('teams')) tabName = 'teams';
+                    else if (linkText.includes('submissions')) tabName = 'submissions';
+                    else if (linkText.includes('schedule') || linkText.includes('events')) tabName = 'schedule';
+                    else if (linkText.includes('settings')) tabName = 'settings';
+                    else if (linkText.includes('drafts')) tabName = 'drafts';
+                    else if (linkText.includes('profile')) tabName = 'profile';
+                    else if (linkText.includes('help')) tabName = 'help';
+
+                    switchTab(tabName);
+                    if (tabName === 'teams') loadAllTeams();
+                });
+            });
+
+            // Handle new project button
+            const newProjectBtn = document.querySelector('button');
+            if (newProjectBtn && newProjectBtn.textContent.toLowerCase().includes('new project')) {
+                newProjectBtn.addEventListener('click', () => {
+                    switchTab('drafts'); // or some other tab
+                });
+            }
+        });
+
+    </script>
+</body>
+
+</html>
