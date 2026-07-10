@@ -279,6 +279,22 @@ def get_all_teams():
 
 
 # ---------------------------------------------------------------------------
+# GET /teams/{team_id}/members
+# ---------------------------------------------------------------------------
+@app.get("/teams/{team_id}/members")
+def get_team_members(team_id: int):
+    """Return all members for a specific team."""
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT user_id, username, role FROM Users WHERE team_id = ?", (team_id,))
+    members = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+
+    return {"members": members}
+
+
+# ---------------------------------------------------------------------------
 # POST /judge/publish
 # ---------------------------------------------------------------------------
 @app.post("/judge/publish")

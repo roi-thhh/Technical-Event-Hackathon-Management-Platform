@@ -535,9 +535,13 @@
                 let html = `<div class="w-full max-w-4xl mx-auto"><h2 class="font-headline-xl text-primary-fixed mb-6">Registered Teams</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
                 data.teams.forEach(t => {
                     const statusColor = t.submission_status === 'submitted' ? 'text-secondary-fixed' : 'text-on-surface-variant';
+                    const escapedTeamName = t.team_name.replace(/'/g, "\\'");
                     html += `
-            <div class="glass-panel p-6 rounded-xl border border-surface-variant flex flex-col gap-2">
-                <h3 class="font-headline-lg text-xl text-on-background">${t.team_name}</h3>
+            <div onclick="showTeamMembers(${t.team_id}, '${escapedTeamName}')" class="glass-panel p-6 rounded-xl border border-surface-variant flex flex-col gap-2 bg-surface-container-highest/30 backdrop-blur-xl group cursor-pointer hover:border-primary-fixed/50 hover:bg-surface-container-highest/50 transition-all">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-headline-lg text-xl text-on-background group-hover:text-primary-fixed transition-colors">${t.team_name}</h3>
+                    <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary-fixed transition-colors">group</span>
+                </div>
                 <p class="font-label-sm uppercase ${statusColor}">Status: ${t.submission_status}</p>
                 <p class="font-body-md text-on-surface-variant truncate">Link: ${t.github_link || 'N/A'}</p>
             </div>`;
@@ -548,6 +552,63 @@
             } catch (err) {
                 console.error(err);
             }
+        }
+
+        async function showTeamMembers(teamId, teamName) {
+            const modal = document.getElementById('members-modal');
+            const content = document.getElementById('members-modal-content');
+            const title = document.getElementById('members-modal-title');
+            const list = document.getElementById('members-modal-list');
+            
+            title.textContent = `${teamName} Members`;
+            list.innerHTML = `<div class="flex justify-center p-4">
+                <span class="material-symbols-outlined animate-spin text-primary-fixed text-3xl">progress_activity</span>
+            </div>`;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            try {
+                const res = await fetch(`/teams/${teamId}/members`);
+                if(!res.ok) throw new Error('Failed to fetch members');
+                const data = await res.json();
+                
+                if (data.members.length === 0) {
+                    list.innerHTML = '<p class="text-on-surface-variant text-center">No members have joined this team yet.</p>';
+                    return;
+                }
+
+                list.innerHTML = data.members.map(m => `
+                    <div class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-highest/50 border border-surface-variant/50 hover:bg-surface-variant/30 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-primary-fixed/20 text-primary-fixed flex items-center justify-center font-bold text-lg">
+                            ${m.username.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <p class="font-body-md text-on-surface font-semibold">${m.username}</p>
+                            <p class="font-label-sm text-on-surface-variant capitalize">${m.role}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch(err) {
+                console.error(err);
+                list.innerHTML = '<p class="text-error-container text-center">Error loading members.</p>';
+            }
+        }
+
+        function closeMembersModal() {
+            const modal = document.getElementById('members-modal');
+            const content = document.getElementById('members-modal-content');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
         }
     </script>
     <script>
@@ -668,6 +729,22 @@
         });
 
     </script>
+    <!-- Modal for displaying team members -->
+    <div id="members-modal" class="fixed inset-0 z-50 hidden bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-surface-container border border-surface-variant w-full max-w-md rounded-2xl overflow-hidden shadow-2xl transform transition-all scale-95 opacity-0 duration-200" id="members-modal-content">
+            <div class="p-6 border-b border-surface-variant flex justify-between items-center bg-surface-container-high">
+                <h3 class="font-headline-lg text-primary-fixed" id="members-modal-title">Team Members</h3>
+                <button onclick="closeMembersModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-variant/50 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="members-modal-list" class="space-y-3">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
