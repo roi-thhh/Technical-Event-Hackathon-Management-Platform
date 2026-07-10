@@ -197,47 +197,42 @@
 <span id="status-text" class="font-label-sm text-label-sm text-on-surface">Submission Open</span>
 </div>
 </div>
-<!-- Central Glassmorphic Submission Form -->
-<div class="w-full max-w-2xl bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high shadow-2xl relative overflow-hidden group">
-<!-- Subtle inner top highlight for glass effect -->
-<div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-<div class="p-md md:p-xl flex flex-col gap-lg">
-<!-- Header -->
-<div class="text-center">
-<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-lowest border-2 border-outline-variant mb-4 relative">
-<span class="material-symbols-outlined text-3xl text-secondary-fixed">rocket_launch</span>
+<!-- Central Glassmorphic Overview Card -->
+<div class="w-full max-w-2xl bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high shadow-2xl relative overflow-hidden group p-md md:p-xl flex flex-col gap-lg">
+    <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+    <div class="text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-lowest border-2 border-outline-variant mb-4 relative">
+            <span class="material-symbols-outlined text-3xl text-primary-fixed">waving_hand</span>
+        </div>
+        <h2 class="font-headline-lg-mobile md:font-headline-lg text-primary-fixed mb-2">Participant Dashboard</h2>
+        <p class="text-on-surface-variant font-body-md">Welcome to ToyCad Hackathon! Track your team progress and submission details here.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Team Name Card -->
+        <div class="bg-surface-container-high/40 border border-surface-variant/40 rounded-2xl p-5 flex flex-col gap-2">
+            <span class="font-label-sm text-xs text-on-surface-variant uppercase">Your Team</span>
+            <h4 id="dash-team-name" class="font-headline-lg text-xl text-on-surface">—</h4>
+        </div>
+        
+        <!-- Submission Status Card -->
+        <div class="bg-surface-container-high/40 border border-surface-variant/40 rounded-2xl p-5 flex flex-col gap-2">
+            <span class="font-label-sm text-xs text-on-surface-variant uppercase">Submission Status</span>
+            <h4 id="dash-submission-status" class="font-headline-lg text-xl text-on-surface-variant capitalize">Pending</h4>
+        </div>
+    </div>
+
+    <!-- Quick action to go to submissions tab -->
+    <div class="mt-4 flex justify-center">
+        <button onclick="document.querySelector('nav a:nth-child(3), nav.md\\:hidden a:nth-child(3)').click()" class="bg-primary-fixed text-on-primary-fixed font-headline-lg text-sm px-6 py-3 rounded-full hover:bg-primary-fixed-dim transition-colors flex items-center gap-2">
+            <span>Manage Submission</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+    </div>
+    
+    <!-- Dynamic Results section -->
+    <div id="dashboard-results-container"></div>
 </div>
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-primary-fixed mb-2">Deploy Your Toy</h2>
-<p class="text-on-surface-variant font-body-md">Submit your final hackathon project details below. Ensure your repository is public.</p>
-</div>
-<!-- Form Fields -->
-<form id="submit-form" class="flex flex-col gap-md">
-<!-- Repository URL Input -->
-<div class="flex flex-col gap-xs">
-<label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="repo-url">
-<span class="material-symbols-outlined text-[16px]">link</span>
-                                GitHub repository link
-                            </label>
-<div class="relative">
-<input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md placeholder-on-surface-variant/50 focus:border-primary-fixed focus:ring-0 transition-colors outline-none h-[60px]" id="repo-url" placeholder="https://github.com/your-username/toy-project" type="url"/>
-</div>
-</div>
-<!-- Feedback message -->
-<div id="submit-feedback" class="hidden px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center"></div>
-<!-- Submit Action -->
-<div class="mt-4 pt-md border-t border-surface-container-highest">
-<button id="submit-btn" class="w-full bg-secondary-fixed text-on-secondary-fixed rounded-2xl py-4 px-8 font-headline-lg-mobile font-bold border-2 border-surface-container-lowest shadow-[0_6px_0_0_#0e0e0e] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#0e0e0e] active:translate-y-[6px] active:shadow-none transition-all flex items-center justify-center gap-3" type="button">
-<span>Submit Project</span>
-<span class="material-symbols-outlined font-bold text-2xl">arrow_forward</span>
-</button>
-</div>
-</form>
-</div>
-</div>
-<!-- Decorative footer text -->
-<p class="font-label-sm text-label-sm text-on-surface-variant/50 mt-4 text-center max-w-md">
-                Submissions are final once reviewed by judges. Make sure your repository is public and includes a README.
-            </p>
 </div>
 </main>
 
@@ -255,11 +250,17 @@ document.getElementById('logout-link').addEventListener('click', () => {
     window.location.href = '/static/login.html';
 });
 
-// Submit project
-document.getElementById('submit-btn').addEventListener('click', async () => {
+// Submit / Edit project handlers
+document.addEventListener('click', async (e) => {
+    const submitBtn = e.target.closest('#submit-btn');
+    if (!submitBtn) return;
+    e.preventDefault();
+    
     const btn = document.getElementById('submit-btn');
     const feedbackEl = document.getElementById('submit-feedback');
     const githubLink = document.getElementById('repo-url').value.trim();
+    const projectDesc = document.getElementById('project-desc').value.trim();
+    const screenshot = document.getElementById('screenshot-url').value.trim();
     const teamId = parseInt(sessionStorage.getItem('team_id'));
 
     feedbackEl.classList.add('hidden');
@@ -279,13 +280,20 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     }
 
     btn.disabled = true;
-    btn.querySelector('span:first-child').textContent = 'Submitting...';
+    const btnTextEl = btn.querySelector('#submit-btn-text');
+    const originalText = btnTextEl ? btnTextEl.textContent : 'Submit Project';
+    if (btnTextEl) btnTextEl.textContent = 'Submitting...';
 
     try {
         const res = await fetch(`${API}/participant/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ team_id: teamId, github_link: githubLink })
+            body: JSON.stringify({
+                team_id: teamId,
+                github_link: githubLink,
+                project_description: projectDesc,
+                screenshot: screenshot
+            })
         });
 
         if (!res.ok) {
@@ -297,21 +305,209 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
         feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-secondary-fixed/20 border border-secondary-fixed/30 text-secondary-fixed';
         feedbackEl.classList.remove('hidden');
 
-        // Update status badge
-        document.getElementById('status-text').textContent = 'Submitted ✓';
-
-        // Disable form
-        btn.querySelector('span:first-child').textContent = 'Submitted ✓';
-        document.getElementById('repo-url').disabled = true;
+        await loadSubmissionDetails();
+        await loadDashboardData();
 
     } catch (err) {
         feedbackEl.textContent = err.message;
         feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
         feedbackEl.classList.remove('hidden');
         btn.disabled = false;
-        btn.querySelector('span:first-child').textContent = 'Submit Project';
+        if (btnTextEl) btnTextEl.textContent = originalText;
     }
 });
+
+// Edit button handler
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#edit-btn')) {
+        const repoInput = document.getElementById('repo-url');
+        const descInput = document.getElementById('project-desc');
+        const screenshotInput = document.getElementById('screenshot-url');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitBtnText = document.getElementById('submit-btn-text');
+        const submitBtnIcon = document.getElementById('submit-btn-icon');
+        const editBtn = document.getElementById('edit-btn');
+        
+        repoInput.disabled = false;
+        descInput.disabled = false;
+        screenshotInput.disabled = false;
+        
+        submitBtn.classList.remove('opacity-50', 'pointer-events-none');
+        if (submitBtnText) submitBtnText.textContent = 'Save Changes';
+        if (submitBtnIcon) submitBtnIcon.textContent = 'save';
+        
+        editBtn.classList.add('hidden');
+    }
+});
+
+// Screenshot URL live preview
+document.addEventListener('input', (e) => {
+    if (e.target.id === 'screenshot-url') {
+        const val = e.target.value.trim();
+        const previewBox = document.getElementById('preview-box');
+        const previewImg = document.getElementById('screenshot-preview');
+        
+        if (val) {
+            previewImg.src = val;
+            previewBox.classList.remove('hidden');
+        } else {
+            previewBox.classList.add('hidden');
+        }
+    }
+});
+
+// Render submission tab template
+function renderSubmissionsTabHTML() {
+    return `
+    <div class="w-full max-w-2xl bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high shadow-2xl relative overflow-hidden group p-md md:p-xl flex flex-col gap-lg">
+        <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-lowest border-2 border-outline-variant mb-4 relative">
+                <span class="material-symbols-outlined text-3xl text-secondary-fixed">rocket_launch</span>
+            </div>
+            <h2 class="font-headline-lg-mobile md:font-headline-lg text-primary-fixed mb-2">Deploy Your Toy</h2>
+            <p class="text-on-surface-variant font-body-md">Submit your final hackathon project details below. Ensure your repository is public.</p>
+        </div>
+        
+        <form id="submit-form" class="flex flex-col gap-md">
+            <div class="flex flex-col gap-xs">
+                <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="repo-url">
+                    <span class="material-symbols-outlined text-[16px]">link</span>
+                    GitHub repository link
+                </label>
+                <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md placeholder-on-surface-variant/50 focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px] disabled:opacity-50 disabled:bg-surface-container-low" id="repo-url" placeholder="https://github.com/your-username/toy-project" type="url"/>
+            </div>
+            
+            <div class="flex flex-col gap-xs">
+                <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="project-desc">
+                    <span class="material-symbols-outlined text-[16px]">description</span>
+                    Project Description
+                </label>
+                <textarea class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md placeholder-on-surface-variant/50 focus:border-primary-fixed focus:ring-0 transition-all outline-none min-h-[100px] disabled:opacity-50 disabled:bg-surface-container-low" id="project-desc" placeholder="Describe what your toy project does..."></textarea>
+            </div>
+            
+            <div class="flex flex-col gap-xs">
+                <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="screenshot-url">
+                    <span class="material-symbols-outlined text-[16px]">image</span>
+                    Screenshot Image URL
+                </label>
+                <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md placeholder-on-surface-variant/50 focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px] disabled:opacity-50 disabled:bg-surface-container-low" id="screenshot-url" placeholder="https://example.com/screenshot.png" type="url"/>
+            </div>
+            
+            <div id="preview-box" class="hidden flex flex-col gap-xs mt-2">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Screenshot Preview:</span>
+                <div class="border border-surface-container-highest rounded-2xl overflow-hidden max-h-60 flex items-center justify-center bg-surface-container-low">
+                    <img id="screenshot-preview" src="" alt="Screenshot preview" class="w-full h-full object-cover"/>
+                </div>
+            </div>
+            
+            <div id="submit-feedback" class="hidden px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center"></div>
+            
+            <div class="mt-4 pt-md border-t border-surface-container-highest flex gap-4">
+                <button id="edit-btn" class="hidden flex-1 bg-surface-container-high text-on-surface-variant border border-outline-variant rounded-2xl py-4 font-headline-lg-mobile font-bold transition-all hover:bg-surface-variant flex items-center justify-center gap-2" type="button">
+                    <span class="material-symbols-outlined">edit</span>
+                    <span>Edit Submission</span>
+                </button>
+                <button id="submit-btn" class="flex-1 bg-secondary-fixed text-on-secondary-fixed rounded-2xl py-4 px-8 font-headline-lg-mobile font-bold border-2 border-surface-container-lowest shadow-[0_6px_0_0_#0e0e0e] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#0e0e0e] active:translate-y-[6px] active:shadow-none transition-all flex items-center justify-center gap-3" type="button">
+                    <span id="submit-btn-text">Submit Project</span>
+                    <span class="material-symbols-outlined font-bold text-2xl" id="submit-btn-icon">arrow_forward</span>
+                </button>
+            </div>
+        </form>
+    </div>
+    `;
+}
+
+async function loadSubmissionDetails() {
+    const teamId = sessionStorage.getItem('team_id');
+    if (!teamId || teamId === 'null') return;
+    
+    try {
+        const res = await fetch(`/teams/${teamId}`);
+        if (!res.ok) throw new Error("Failed to fetch team details");
+        const team = await res.json();
+        
+        const repoInput = document.getElementById('repo-url');
+        const descInput = document.getElementById('project-desc');
+        const screenshotInput = document.getElementById('screenshot-url');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitBtnText = document.getElementById('submit-btn-text');
+        const submitBtnIcon = document.getElementById('submit-btn-icon');
+        const editBtn = document.getElementById('edit-btn');
+        const previewBox = document.getElementById('preview-box');
+        const previewImg = document.getElementById('screenshot-preview');
+        
+        if (!repoInput) return; // submissions tab not rendered yet
+
+        repoInput.value = team.github_link || '';
+        descInput.value = team.project_description || '';
+        screenshotInput.value = team.screenshot || '';
+        
+        if (team.screenshot) {
+            previewImg.src = team.screenshot;
+            previewBox.classList.remove('hidden');
+        } else {
+            previewBox.classList.add('hidden');
+        }
+        
+        if (team.submission_status === 'submitted') {
+            repoInput.disabled = true;
+            descInput.disabled = true;
+            screenshotInput.disabled = true;
+            
+            editBtn.classList.remove('hidden');
+            
+            submitBtn.classList.add('opacity-50', 'pointer-events-none');
+            if (submitBtnText) submitBtnText.textContent = 'Submitted ✓';
+            if (submitBtnIcon) submitBtnIcon.textContent = 'done';
+            
+            document.getElementById('status-text').textContent = 'Submitted ✓';
+        } else {
+            repoInput.disabled = false;
+            descInput.disabled = false;
+            screenshotInput.disabled = false;
+            
+            editBtn.classList.add('hidden');
+            
+            submitBtn.classList.remove('opacity-50', 'pointer-events-none');
+            if (submitBtnText) submitBtnText.textContent = 'Submit Project';
+            if (submitBtnIcon) submitBtnIcon.textContent = 'arrow_forward';
+            
+            document.getElementById('status-text').textContent = 'Submission Open';
+        }
+        
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+async function loadDashboardData() {
+    const teamId = sessionStorage.getItem('team_id');
+    if (!teamId || teamId === 'null') return;
+    
+    try {
+        const res = await fetch(`/teams/${teamId}`);
+        if (!res.ok) throw new Error("Failed to fetch team details");
+        const team = await res.json();
+        
+        const teamNameEl = document.getElementById('dash-team-name');
+        const statusEl = document.getElementById('dash-submission-status');
+        
+        if (teamNameEl) teamNameEl.textContent = team.team_name;
+        
+        if (statusEl) {
+            statusEl.textContent = team.submission_status;
+            if (team.submission_status === 'submitted') {
+                statusEl.className = 'font-headline-lg text-xl text-secondary-fixed capitalize';
+            } else {
+                statusEl.className = 'font-headline-lg text-xl text-on-surface-variant capitalize';
+            }
+        }
+        
+    } catch(err) {
+        console.error(err);
+    }
+}
 
 async function loadGrades() {
     const teamId = sessionStorage.getItem('team_id');
@@ -323,8 +519,8 @@ async function loadGrades() {
         const data = await res.json();
         
         if (data.published && data.evaluations.length > 0) {
-            // Display grades on the dashboard
-            const dashboard = document.querySelector('#submit-form').parentElement;
+            const container = document.getElementById('dashboard-results-container');
+            if (!container) return;
             
             let html = `<div class="mt-8 pt-6 border-t border-surface-container-highest">
                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary-fixed/20 border-2 border-secondary-fixed/50 mb-4 relative">
@@ -345,7 +541,7 @@ async function loadGrades() {
             });
             
             html += `</div></div>`;
-            dashboard.insertAdjacentHTML('beforeend', html);
+            container.innerHTML = html;
         }
     } catch(err) {
         console.error('Error fetching grades:', err);
@@ -353,7 +549,11 @@ async function loadGrades() {
 }
 
 // Call on load
-setTimeout(loadGrades, 500);
+setTimeout(() => {
+    loadDashboardData();
+    loadSubmissionDetails();
+    loadGrades();
+}, 500);
 
 </script>
 <script>
@@ -462,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainCanvas = document.querySelector('main');
     
     // Create tab contents if they don't exist
-    const tabs = ['submissions', 'schedule', 'settings', 'drafts', 'events', 'profile', 'help'];
+    const tabs = ['schedule', 'settings', 'drafts', 'events', 'profile', 'help'];
     
     // Wrap existing content in a dashboard tab
     const existingContent = Array.from(mainCanvas.children).filter(el => el.tagName !== 'SCRIPT');
@@ -471,6 +671,13 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardTab.className = 'tab-content';
     existingContent.forEach(el => dashboardTab.appendChild(el));
     mainCanvas.prepend(dashboardTab);
+
+    // Create submissions tab
+    const submissionsTab = document.createElement('div');
+    submissionsTab.id = 'tab-submissions';
+    submissionsTab.className = 'tab-content hidden relative z-10 min-h-full flex flex-col items-center justify-center p-8 w-full';
+    submissionsTab.innerHTML = renderSubmissionsTabHTML();
+    mainCanvas.appendChild(submissionsTab);
 
     // Create an empty teams tab that will be populated by loadAllTeams()
     const teamsTab = document.createElement('div');
@@ -559,6 +766,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             switchTab(tabName);
             if (tabName === 'teams') loadAllTeams();
+            else if (tabName === 'submissions') loadSubmissionDetails();
+            else if (tabName === 'dashboard') loadDashboardData();
         });
     });
 

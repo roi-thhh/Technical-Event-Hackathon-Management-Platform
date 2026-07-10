@@ -243,6 +243,28 @@
                             class="text-on-background">Select a team</strong></p>
                 </div>
                 <div class="p-6 flex-1 overflow-y-auto flex flex-col gap-6">
+                    <!-- Project Details (GitHub, Desc, Screenshot) -->
+                    <div id="project-details-box" class="hidden bg-surface-container-high/50 border border-surface-variant p-4 rounded-xl flex flex-col gap-3">
+                        <div>
+                            <span class="text-xs font-label-sm uppercase text-on-surface-variant block mb-1">GitHub Repo</span>
+                            <a id="project-github-link" href="#" target="_blank" class="text-primary-fixed hover:underline font-body-md text-sm flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">link</span>
+                                <span id="project-github-url">https://github.com/project</span>
+                            </a>
+                        </div>
+                        <div>
+                            <span class="text-xs font-label-sm uppercase text-on-surface-variant block mb-1">Description</span>
+                            <p id="project-description-text" class="text-on-surface text-sm font-body-md leading-relaxed"></p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-label-sm uppercase text-on-surface-variant block mb-2">Screenshot</span>
+                            <div class="border border-surface-variant rounded-lg overflow-hidden max-h-40 flex items-center justify-center bg-surface-container-low">
+                                <img id="project-screenshot-img" src="" alt="Project Screenshot" class="w-full h-full object-cover hidden" />
+                            </div>
+                            <span id="no-screenshot-text" class="text-on-surface-variant text-sm font-body-md italic hidden">No screenshot provided</span>
+                        </div>
+                    </div>
+                    
                     <!-- Score slider -->
                     <div>
                         <div class="flex justify-between items-end mb-4">
@@ -374,6 +396,36 @@
             document.getElementById('publish-grades-btn').disabled = false;
             document.getElementById('eval-feedback').classList.add('hidden');
 
+            // Show project details if loaded
+            if (window.teamsList) {
+                const team = window.teamsList.find(t => t.team_id === teamId);
+                if (team) {
+                    document.getElementById('project-details-box').classList.remove('hidden');
+                    
+                    const ghUrl = document.getElementById('project-github-url');
+                    const ghLink = document.getElementById('project-github-link');
+                    ghUrl.textContent = team.github_link || 'No link provided';
+                    ghLink.href = team.github_link || '#';
+                    if (!team.github_link) ghLink.classList.add('pointer-events-none');
+                    else ghLink.classList.remove('pointer-events-none');
+                    
+                    const desc = document.getElementById('project-description-text');
+                    desc.textContent = team.project_description || 'No description provided.';
+                    
+                    const img = document.getElementById('project-screenshot-img');
+                    const noImg = document.getElementById('no-screenshot-text');
+                    if (team.screenshot) {
+                        img.src = team.screenshot;
+                        img.classList.remove('hidden');
+                        noImg.classList.add('hidden');
+                    } else {
+                        img.src = '';
+                        img.classList.add('hidden');
+                        noImg.classList.remove('hidden');
+                    }
+                }
+            }
+
             // Re-render to update active state
             const cards = document.querySelectorAll('[data-team-id]');
             cards.forEach(card => {
@@ -395,6 +447,7 @@
                 const res = await fetch(`${API}/judge/dashboard`);
                 const data = await res.json();
                 const teams = data.teams;
+                window.teamsList = teams; // Save globally
 
                 if (teams.length === 0) {
                     listEl.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-on-surface-variant">
@@ -405,9 +458,7 @@
                 }
 
                 // First team is selected by default
-                selectedTeamId = teams[0].team_id;
-                document.getElementById('eval-team-name').textContent = teams[0].team_name;
-                document.getElementById('submit-eval-btn').disabled = false;
+                selectTeam(teams[0].team_id, teams[0].team_name);
 
                 listEl.innerHTML = teams.map((t, i) => renderProjectCard(t, i === 0)).join('');
             } catch (err) {

@@ -42,10 +42,22 @@ def init_db():
             team_id INTEGER PRIMARY KEY AUTOINCREMENT,
             team_name VARCHAR(100) UNIQUE NOT NULL,
             github_link VARCHAR(255),
+            project_description TEXT DEFAULT NULL,
+            screenshot VARCHAR(255) DEFAULT NULL,
             submission_status VARCHAR(20) DEFAULT 'pending',
             grades_published INTEGER DEFAULT 0
         )
     """)
+
+    # Schema migration: alter existing Teams table if columns do not exist
+    try:
+        cursor.execute("ALTER TABLE Teams ADD COLUMN project_description TEXT DEFAULT NULL")
+    except sqlite3.OperationalError:
+        pass # Column already exists
+    try:
+        cursor.execute("ALTER TABLE Teams ADD COLUMN screenshot VARCHAR(255) DEFAULT NULL")
+    except sqlite3.OperationalError:
+        pass # Column already exists
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Evaluations (

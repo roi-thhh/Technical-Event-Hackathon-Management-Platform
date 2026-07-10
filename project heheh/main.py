@@ -80,6 +80,8 @@ class EvaluateRequest(BaseModel):
 class SubmitRequest(BaseModel):
     team_id: int
     github_link: str
+    project_description: str | None = None
+    screenshot: str | None = None
 
 
 class RegisterRequest(BaseModel):
@@ -179,7 +181,7 @@ def admin_dashboard():
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT team_id, team_name, github_link, submission_status FROM Teams")
+    cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams")
     teams = [dict(row) for row in cursor.fetchall()]
     conn.close()
 
@@ -196,7 +198,7 @@ def judge_dashboard():
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT team_id, team_name, github_link, submission_status FROM Teams WHERE submission_status = ?",
+        "SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams WHERE submission_status = ?",
         ("submitted",),
     )
     teams = [dict(row) for row in cursor.fetchall()]
@@ -242,7 +244,7 @@ def judge_evaluate(body: EvaluateRequest):
 # ---------------------------------------------------------------------------
 @app.post("/participant/submit")
 def participant_submit(body: SubmitRequest):
-    """Update a team's github_link and set submission_status to 'submitted'."""
+    """Update a team's submission details and set submission_status to 'submitted'."""
     conn = get_db()
     cursor = conn.cursor()
 
@@ -253,8 +255,8 @@ def participant_submit(body: SubmitRequest):
         raise HTTPException(status_code=404, detail=f"Team with id {body.team_id} not found")
 
     cursor.execute(
-        "UPDATE Teams SET github_link = ?, submission_status = 'submitted' WHERE team_id = ?",
-        (body.github_link, body.team_id),
+        "UPDATE Teams SET github_link = ?, project_description = ?, screenshot = ?, submission_status = 'submitted' WHERE team_id = ?",
+        (body.github_link, body.project_description, body.screenshot, body.team_id),
     )
     conn.commit()
     conn.close()
@@ -271,11 +273,30 @@ def get_all_teams():
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT team_id, team_name, github_link, submission_status FROM Teams")
+    cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams")
     teams = [dict(row) for row in cursor.fetchall()]
     conn.close()
 
     return {"teams": teams}
+
+
+# ---------------------------------------------------------------------------
+# GET /teams/{team_id}
+# ---------------------------------------------------------------------------
+@app.get("/teams/{team_id}")
+def get_team_by_id(team_id: int):
+    """Return a single team's details by ID."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams WHERE team_id = ?",
+        (team_id,)
+    )
+    team = cursor.fetchone()
+    conn.close()
+    if team is None:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return dict(team)
 
 
 # ---------------------------------------------------------------------------
