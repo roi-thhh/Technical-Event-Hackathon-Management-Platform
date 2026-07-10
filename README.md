@@ -1,0 +1,1 @@
+# Technical-Event-Hackathon-Management-Platform
