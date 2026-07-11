@@ -102,7 +102,7 @@
 </head>
 <body class="bg-background text-on-surface font-body-md min-h-screen flex selection:bg-primary-fixed selection:text-on-primary-fixed">
 <!-- SideNavBar -->
-<nav class="bg-surface-container-lowest dark:bg-surface-container-lowest h-screen w-64 rounded-r-xl border-r-2 border-outline-variant shadow-md fixed left-0 top-0 flex flex-col z-40 py-lg hidden md:flex">
+<aside class="bg-surface-container-lowest dark:bg-surface-container-lowest h-screen w-64 rounded-r-xl border-r-2 border-outline-variant shadow-md fixed left-0 top-0 flex flex-col z-40 py-lg hidden md:flex">
 <!-- Header -->
 <div class="px-md mb-xl flex items-center gap-sm">
 <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-fixed shrink-0">
@@ -121,7 +121,7 @@
             </button>
 </div>
 <!-- Navigation Links -->
-<div class="flex-1 overflow-y-auto px-2 space-y-2">
+<nav class="flex-1 overflow-y-auto px-2 space-y-2">
 <a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
 <span class="material-symbols-outlined">dashboard</span>
                 Dashboard
@@ -142,7 +142,7 @@
 <span class="material-symbols-outlined">settings</span>
                 Settings
             </a>
-</div>
+</nav>
 <!-- Footer Links -->
 <div class="px-2 mt-auto pt-lg border-t border-surface-variant/50">
 <a class="text-on-surface-variant hover:text-secondary-fixed px-4 py-3 mx-2 flex items-center gap-3 hover:bg-surface-variant/50 rounded-full transition-all font-body-md text-body-md" href="#">
@@ -154,9 +154,32 @@
                 Logout
             </a>
 </div>
-</nav>
+</aside>
 <!-- Main Content Area -->
 <main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop min-w-0 flex flex-col gap-lg">
+<!-- Event Codes Widget -->
+<div id="event-codes-widget" class="bg-surface-container-high border-2 border-outline-variant rounded-2xl p-6 flex flex-wrap gap-4 items-center justify-between hidden mb-4 shadow-xl">
+    <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-primary-fixed/20 text-primary-fixed rounded-full flex items-center justify-center">
+            <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">celebration</span>
+        </div>
+        <div>
+            <h4 id="widget-event-name" class="font-headline-lg text-lg text-primary-fixed leading-none mb-1">Event Title</h4>
+            <p class="text-xs text-on-surface-variant">Active Hackathon Workspace</p>
+        </div>
+    </div>
+    <div class="flex gap-4">
+        <div class="bg-surface-container-lowest px-4 py-2 rounded-full border border-surface-variant flex items-center gap-2">
+            <span class="text-xs text-on-surface-variant font-label-sm uppercase">Event Code:</span>
+            <strong id="widget-event-code" class="text-sm text-secondary-fixed uppercase tracking-wider font-label-sm select-all">——</strong>
+        </div>
+        <div class="bg-surface-container-lowest px-4 py-2 rounded-full border border-surface-variant flex items-center gap-2">
+            <span class="text-xs text-on-surface-variant font-label-sm uppercase">Judge Invite Code:</span>
+            <strong id="widget-judge-code" class="text-sm text-primary-fixed uppercase tracking-wider font-label-sm select-all">——</strong>
+        </div>
+    </div>
+</div>
+
 <!-- Header Section -->
 <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
 <div>
@@ -325,8 +348,12 @@ function closeMembersModal() {
 }
 
 async function loadDashboard() {
+    checkOnboarding();
+    const eventId = sessionStorage.getItem('event_id');
+    if (!eventId || eventId === 'null') return;
+    
     try {
-        const res = await fetch(`${API}/admin/dashboard`);
+        const res = await fetch(`${API}/admin/dashboard?event_id=${eventId}`);
         const data = await res.json();
         const teams = data.teams;
 
@@ -358,6 +385,357 @@ async function loadDashboard() {
     }
 }
 
+function renderSettingsTabHTML() {
+    return `
+    <div class="w-full max-w-2xl bg-surface-dim/80 backdrop-blur-3xl rounded-[2rem] border-2 border-surface-container-high shadow-2xl relative overflow-hidden group p-md md:p-xl flex flex-col gap-lg overflow-y-auto max-h-[85vh]">
+        <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-lowest border-2 border-outline-variant mb-4 relative">
+                <span class="material-symbols-outlined text-3xl text-primary-fixed">admin_panel_settings</span>
+            </div>
+            <h2 class="font-headline-lg-mobile md:font-headline-lg text-primary-fixed mb-2">Organizer Global Controls</h2>
+            <p class="text-on-surface-variant font-body-md">Manage event stages, countdown timer, and registration limits.</p>
+        </div>
+        
+        <form id="settings-form" class="flex flex-col gap-md">
+            <!-- Event Name -->
+            <div class="flex flex-col gap-xs">
+                <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="event-name">
+                    <span class="material-symbols-outlined text-[16px]">celebration</span>
+                    Event Name
+                </label>
+                <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="event-name" placeholder="ToyCad Hackathon 2026" type="text"/>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Max Team Size -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="max-team-size">
+                        <span class="material-symbols-outlined text-[16px]">group_add</span>
+                        Max Team Size
+                    </label>
+                    <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="max-team-size" min="1" max="20" type="number"/>
+                </div>
+                
+                <!-- Countdown End -->
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase flex items-center gap-2" for="countdown-end">
+                        <span class="material-symbols-outlined text-[16px]">timer</span>
+                        Countdown End Time
+                    </label>
+                    <input class="w-full bg-surface-container-lowest border border-surface-container-highest rounded-2xl p-4 text-on-surface font-body-md focus:border-primary-fixed focus:ring-0 transition-all outline-none h-[60px]" id="countdown-end" type="datetime-local"/>
+                </div>
+            </div>
+
+            <!-- Toggles Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-2">
+                <!-- Submissions Switch -->
+                <div class="bg-surface-container-high/40 border border-surface-variant/40 rounded-2xl p-4 flex justify-between items-center">
+                    <div class="flex flex-col gap-1">
+                        <span class="font-bold text-on-surface text-sm">Submissions Stage</span>
+                        <span class="text-xs text-on-surface-variant">Allow participants to submit project details</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="submissions-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-focus:ring-0 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-fixed"></div>
+                    </label>
+                </div>
+
+                <!-- Grades Publication Switch -->
+                <div class="bg-surface-container-high/40 border border-surface-variant/40 rounded-2xl p-4 flex justify-between items-center">
+                    <div class="flex flex-col gap-1">
+                        <span class="font-bold text-on-surface text-sm">Global Grades Release</span>
+                        <span class="text-xs text-on-surface-variant">Make evaluations visible to all participants</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="grades-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-focus:ring-0 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-fixed"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="settings-feedback" class="hidden px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center"></div>
+            
+            <div class="mt-4 pt-md border-t border-surface-container-highest">
+                <button id="save-settings-btn" class="w-full bg-primary-fixed text-on-primary-fixed rounded-2xl py-4 px-8 font-headline-lg-mobile font-bold border-2 border-surface-container-lowest shadow-[0_6px_0_0_#0e0e0e] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#0e0e0e] active:translate-y-[6px] active:shadow-none transition-all flex items-center justify-center gap-3" type="button">
+                    <span>Save Global Settings</span>
+                    <span class="material-symbols-outlined font-bold text-2xl">save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+    `;
+}
+
+async function loadOrganizerSettings() {
+    const eventId = sessionStorage.getItem('event_id');
+    if (!eventId || eventId === 'null') return;
+    
+    try {
+        const res = await fetch(`/organizer/settings?event_id=${eventId}`);
+        if (!res.ok) throw new Error("Failed to load global settings");
+        const settings = await res.json();
+        
+        const eventNameInput = document.getElementById('event-name');
+        if (!eventNameInput) return; // Settings not rendered yet
+        
+        eventNameInput.value = settings.event_name || '';
+        document.getElementById('max-team-size').value = settings.team_size_limit || '4';
+        document.getElementById('countdown-end').value = settings.countdown_end || '';
+        document.getElementById('submissions-toggle').checked = (settings.submissions_open === 'true');
+        document.getElementById('grades-toggle').checked = (settings.grades_published === 'true');
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+async function loadEventDetailsHeader() {
+    const eventId = sessionStorage.getItem('event_id');
+    if (!eventId || eventId === 'null') return;
+    
+    try {
+        const res = await fetch(`/organizer/settings?event_id=${eventId}`);
+        if (!res.ok) throw new Error("Failed to load settings details");
+        const settings = await res.json();
+        
+        const widget = document.getElementById('event-codes-widget');
+        const widgetName = document.getElementById('widget-event-name');
+        const widgetEventCode = document.getElementById('widget-event-code');
+        const widgetJudgeCode = document.getElementById('widget-judge-code');
+        
+        if (widget) {
+            widget.classList.remove('hidden');
+            if (widgetName) widgetName.textContent = settings.event_name || 'Hackathon Event';
+            if (widgetEventCode) widgetEventCode.textContent = settings.event_code || '——';
+            if (widgetJudgeCode) widgetJudgeCode.textContent = settings.judge_invite_code || '——';
+        }
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+// Handle settings save button
+document.addEventListener('click', async (e) => {
+    const saveBtn = e.target.closest('#save-settings-btn');
+    if (!saveBtn) return;
+    e.preventDefault();
+    
+    const eventId = sessionStorage.getItem('event_id');
+    if (!eventId || eventId === 'null') return;
+    
+    const btn = document.getElementById('save-settings-btn');
+    const feedbackEl = document.getElementById('settings-feedback');
+    feedbackEl.classList.add('hidden');
+    
+    btn.disabled = true;
+    const btnTextEl = btn.querySelector('span:first-child');
+    const originalText = btnTextEl ? btnTextEl.textContent : 'Save Global Settings';
+    if (btnTextEl) btnTextEl.textContent = 'Saving...';
+    
+    const payload = {
+        event_id: parseInt(eventId),
+        event_name: document.getElementById('event-name').value.trim(),
+        team_size_limit: parseInt(document.getElementById('max-team-size').value) || 4,
+        countdown_end: document.getElementById('countdown-end').value,
+        submissions_open: document.getElementById('submissions-toggle').checked,
+        grades_published: document.getElementById('grades-toggle').checked
+    };
+    
+    try {
+        const res = await fetch(`/organizer/settings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Failed to save settings");
+        
+        feedbackEl.textContent = '✓ Global settings saved successfully!';
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-secondary-fixed/20 border border-secondary-fixed/30 text-secondary-fixed';
+        feedbackEl.classList.remove('hidden');
+        
+        // Refresh codes header widget
+        loadEventDetailsHeader();
+    } catch(err) {
+        feedbackEl.textContent = err.message;
+        feedbackEl.className = 'px-4 py-3 rounded-2xl font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        if (btnTextEl) btnTextEl.textContent = originalText;
+    }
+});
+
+function checkOnboarding() {
+    const eventId = sessionStorage.getItem('event_id');
+    const overlay = document.getElementById('onboarding-overlay');
+    if (!eventId || eventId === 'null' || eventId === 'undefined') {
+        if (overlay) overlay.classList.remove('hidden');
+    } else {
+        if (overlay) overlay.classList.add('hidden');
+        loadEventDetailsHeader();
+    }
+}
+
+function showHostForm() {
+    document.getElementById('onboard-initial').classList.add('hidden');
+    document.getElementById('onboard-host').classList.remove('hidden');
+    document.getElementById('onboard-join').classList.add('hidden');
+}
+
+function showJoinForm() {
+    document.getElementById('onboard-initial').classList.add('hidden');
+    document.getElementById('onboard-host').classList.add('hidden');
+    document.getElementById('onboard-join').classList.remove('hidden');
+}
+
+function showInitialOnboard() {
+    document.getElementById('onboard-initial').classList.remove('hidden');
+    document.getElementById('onboard-host').classList.add('hidden');
+    document.getElementById('onboard-join').classList.add('hidden');
+}
+
+async function submitHostEvent() {
+    const name = document.getElementById('event-name-input').value.trim();
+    const limit = parseInt(document.getElementById('team-limit-input').value) || 4;
+    const end = document.getElementById('countdown-end-input').value;
+    const feedback = document.getElementById('host-feedback');
+    
+    if (!name) {
+        feedback.textContent = 'Please enter an event name.';
+        feedback.classList.remove('hidden');
+        return;
+    }
+    
+    try {
+        const res = await fetch('/organizer/create-event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                event_name: name,
+                max_team_size: limit,
+                countdown_end: end || null,
+                created_by: parseInt(sessionStorage.getItem('user_id'))
+            })
+        });
+        if (!res.ok) throw new Error('Failed to create event');
+        const data = await res.json();
+        
+        sessionStorage.setItem('event_id', data.event_id);
+        checkOnboarding();
+        loadDashboard();
+    } catch(err) {
+        feedback.textContent = err.message;
+        feedback.classList.remove('hidden');
+    }
+}
+
+async function submitJoinEvent() {
+    const code = document.getElementById('event-code-input').value.trim();
+    const feedback = document.getElementById('join-feedback');
+    
+    if (!code) {
+        feedback.textContent = 'Please enter an event code.';
+        feedback.classList.remove('hidden');
+        return;
+    }
+    
+    try {
+        const res = await fetch('/organizer/join-event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: parseInt(sessionStorage.getItem('user_id')),
+                event_code: code
+            })
+        });
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || 'Failed to join event');
+        }
+        const data = await res.json();
+        
+        sessionStorage.setItem('event_id', data.event_id);
+        checkOnboarding();
+        loadDashboard();
+    } catch(err) {
+        feedback.textContent = err.message;
+        feedback.classList.remove('hidden');
+    }
+}
+
+async function loadOrganizerEvaluations() {
+    const eventId = sessionStorage.getItem('event_id');
+    const tabSub = document.getElementById('tab-submissions');
+    if (!tabSub || !eventId || eventId === 'null') return;
+    
+    tabSub.className = 'tab-content relative z-10 min-h-full flex flex-col p-8 w-full';
+    tabSub.innerHTML = `
+        <div class="w-full max-w-5xl mx-auto flex flex-col gap-md">
+            <div>
+                <h2 class="font-headline-xl text-primary-fixed mb-2">Live Evaluations Matrix</h2>
+                <p class="text-on-surface-variant font-body-md">Monitor real-time grading and feedback from all registered judges.</p>
+            </div>
+            
+            <div class="glass-panel p-6 rounded-xl border border-surface-variant bg-surface-container-highest/30 backdrop-blur-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-surface-variant font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+                                <th class="pb-3 pr-4">Team Name</th>
+                                <th class="pb-3 pr-4">Judge</th>
+                                <th class="pb-3 pr-4">Score</th>
+                                <th class="pb-3">Feedback</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evaluations-matrix-body" class="font-body-md text-sm text-on-surface">
+                            <tr>
+                                <td colspan="4" class="py-4 text-center text-on-surface-variant">Loading evaluations matrix...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    try {
+        const res = await fetch(`/organizer/evaluations/${eventId}`);
+        if (!res.ok) throw new Error("Failed to load evaluations");
+        const data = await res.json();
+        
+        const tbody = document.getElementById('evaluations-matrix-body');
+        if (!tbody) return;
+        
+        if (data.evaluations.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="py-6 text-center text-on-surface-variant italic">No evaluations submitted by judges yet.</td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = data.evaluations.map(e => `
+            <tr class="border-b border-surface-variant/40 hover:bg-surface-variant/20 transition-colors">
+                <td class="py-3 pr-4 font-semibold text-primary-fixed">${escapeHTML(e.team_name)}</td>
+                <td class="py-3 pr-4 text-secondary-fixed font-semibold">${escapeHTML(e.judge_name)}</td>
+                <td class="py-3 pr-4"><span class="font-bold text-base text-secondary-fixed">${e.score}</span><span class="text-xs text-on-surface-variant">/10</span></td>
+                <td class="py-3 max-w-xs truncate" title="${escapeHTML(e.feedback)}">${escapeHTML(e.feedback)}</td>
+            </tr>
+        `).join('');
+    } catch(err) {
+        console.error(err);
+        const tbody = document.getElementById('evaluations-matrix-body');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-error">Failed to load evaluations: ${err.message}</td></tr>`;
+    }
+}
+
+function escapeHTML(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+checkOnboarding();
 loadDashboard();
 </script>
 <script>
@@ -368,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainCanvas = document.querySelector('main');
     
     // Create tab contents if they don't exist
-    const tabs = ['teams', 'submissions', 'schedule', 'settings', 'drafts', 'events', 'profile', 'help'];
+    const tabs = ['teams', 'submissions', 'schedule', 'drafts', 'events', 'profile', 'help'];
     
     // Wrap existing content in a dashboard tab
     const existingContent = Array.from(mainCanvas.children).filter(el => el.tagName !== 'SCRIPT');
@@ -377,6 +755,13 @@ document.addEventListener('DOMContentLoaded', () => {
     dashboardTab.className = 'tab-content';
     existingContent.forEach(el => dashboardTab.appendChild(el));
     mainCanvas.prepend(dashboardTab);
+
+    // Create settings tab
+    const settingsTab = document.createElement('div');
+    settingsTab.id = 'tab-settings';
+    settingsTab.className = 'tab-content hidden relative z-10 min-h-full flex flex-col items-center justify-center p-8 w-full';
+    settingsTab.innerHTML = renderSettingsTabHTML();
+    mainCanvas.appendChild(settingsTab);
 
     tabs.forEach(tab => {
         const tabEl = document.createElement('div');
@@ -458,6 +843,8 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (linkText.includes('help')) tabName = 'help';
             
             switchTab(tabName);
+            if (tabName === 'settings') loadOrganizerSettings();
+            else if (tabName === 'submissions') loadOrganizerEvaluations();
         });
     });
 
@@ -483,6 +870,73 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="p-6">
             <div id="members-modal-list" class="space-y-3">
                 <!-- Injected dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Onboarding overlay -->
+<div id="onboarding-overlay" class="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl flex items-center justify-center p-6 hidden">
+    <div class="w-full max-w-xl bg-surface-dim/80 border-2 border-outline-variant rounded-[2rem] p-8 shadow-2xl relative flex flex-col gap-6 text-center">
+        <!-- Host Event Section -->
+        <div id="onboard-initial" class="flex flex-col gap-4">
+            <span class="material-symbols-outlined text-[64px] text-primary-fixed block">rocket_launch</span>
+            <h2 class="font-headline-xl text-primary-fixed font-black">Welcome Organizer!</h2>
+            <p class="text-on-surface-variant font-body-md">Get started by creating a new hackathon event or joining an existing one using an Event Code.</p>
+            <div class="flex gap-4 mt-4">
+                <button onclick="showHostForm()" class="flex-1 bg-primary-fixed text-on-primary-fixed font-bold py-4 rounded-full border-[3px] border-black shadow-[0_4px_0_#000] active:translate-y-[4px] active:shadow-none hover:bg-white transition-all">
+                    Host Event
+                </button>
+                <button onclick="showJoinForm()" class="flex-1 bg-surface-container-high border-2 border-outline-variant font-bold py-4 rounded-full text-on-background hover:bg-surface-variant transition-all">
+                    Join Event
+                </button>
+            </div>
+        </div>
+
+        <!-- Host Event Form -->
+        <div id="onboard-host" class="hidden flex flex-col gap-4 text-left">
+            <h2 class="font-headline-lg text-primary-fixed">Host a New Event</h2>
+            <p class="text-on-surface-variant font-body-md text-sm">Fill in the primary configurations below. You can update these details anytime.</p>
+            
+            <div class="space-y-xs">
+                <label class="font-label-sm text-label-sm uppercase ml-2 text-on-surface-variant" for="event-name-input">Event Name</label>
+                <input id="event-name-input" type="text" class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-3 px-6 focus:outline-none focus:border-primary-fixed transition-colors placeholder:text-surface-variant" placeholder="e.g. ToyCad Winter Hackathon" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-xs">
+                    <label class="font-label-sm text-label-sm uppercase ml-2 text-on-surface-variant">Max Team Size</label>
+                    <input id="team-limit-input" type="number" class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-3 px-6 focus:outline-none focus:border-primary-fixed transition-colors" value="4" min="1" />
+                </div>
+                <div class="space-y-xs">
+                    <label class="font-label-sm text-label-sm uppercase ml-2 text-on-surface-variant">Countdown End</label>
+                    <input id="countdown-end-input" type="datetime-local" class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-3 px-6 focus:outline-none focus:border-primary-fixed transition-colors" />
+                </div>
+            </div>
+
+            <div id="host-feedback" class="hidden px-4 py-2 bg-error-container/30 border border-error/30 text-error rounded-full text-center text-sm"></div>
+
+            <div class="flex gap-4 mt-2">
+                <button onclick="submitHostEvent()" class="flex-1 bg-primary-fixed text-on-primary-fixed font-bold py-3 rounded-full border-[3px] border-black hover:bg-white transition-all">Create Event</button>
+                <button onclick="showInitialOnboard()" class="px-6 bg-transparent border border-outline rounded-full text-on-surface hover:bg-surface-variant/30 transition-all">Back</button>
+            </div>
+        </div>
+
+        <!-- Join Event Form -->
+        <div id="onboard-join" class="hidden flex flex-col gap-4 text-left">
+            <h2 class="font-headline-lg text-primary-fixed">Join an Event</h2>
+            <p class="text-on-surface-variant font-body-md text-sm">Enter the Event Code generated by the lead organizer to join the workspace.</p>
+            
+            <div class="space-y-xs">
+                <label class="font-label-sm text-label-sm uppercase ml-2 text-on-surface-variant" for="event-code-input">Event Code</label>
+                <input id="event-code-input" type="text" class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-3 px-6 focus:outline-none focus:border-primary-fixed transition-colors uppercase placeholder:text-surface-variant" placeholder="e.g. TOYCAD" />
+            </div>
+
+            <div id="join-feedback" class="hidden px-4 py-2 bg-error-container/30 border border-error/30 text-error rounded-full text-center text-sm"></div>
+
+            <div class="flex gap-4 mt-2">
+                <button onclick="submitJoinEvent()" class="flex-1 bg-primary-fixed text-on-primary-fixed font-bold py-3 rounded-full border-[3px] border-black hover:bg-white transition-all">Join Event</button>
+                <button onclick="showInitialOnboard()" class="px-6 bg-transparent border border-outline rounded-full text-on-surface hover:bg-surface-variant/30 transition-all">Back</button>
             </div>
         </div>
     </div>

@@ -73,6 +73,7 @@ class LoginResponse(BaseModel):
     user_id: int
     role: str
     team_id: int | None
+    event_id: int | None
 
 
 class EvaluateRequest(BaseModel):
@@ -94,6 +95,8 @@ class RegisterRequest(BaseModel):
     password: str
     role: str = "participant"
     team_name: str | None = None
+    invite_code: str | None = None  # Admin event code or Judge invite code
+    event_code: str | None = None   # Participant event code
 
 
 class PublishRequest(BaseModel):
@@ -112,13 +115,38 @@ class ProfileRequest(BaseModel):
     github: str | None = None
 
 
+class OrganizerSettingsRequest(BaseModel):
+    event_id: int
+    event_name: str
+    team_size_limit: int
+    submissions_open: bool
+    countdown_end: str
+    grades_published: bool
+
+
+class EventCreateRequest(BaseModel):
+    event_name: str
+    max_team_size: int
+    countdown_end: str | None = None
+    created_by: int
+
+
+class EventJoinRequest(BaseModel):
+    user_id: int
+    event_code: str
+
+
+class TransferLeadershipRequest(BaseModel):
+    leader_id: int
+    new_leader_id: int
+
+
 # ---------------------------------------------------------------------------
 # POST /register
 # ---------------------------------------------------------------------------
 @app.post("/register")
 def register(body: RegisterRequest):
-    """Register a new user. Participants can optionally create/join a team."""
-    # Validate role
+    """Register a new user. Scopes user and team by event/judge invite codes."""
     if body.role not in ("admin", "judge", "participant"):
         raise HTTPException(status_code=400, detail="Role must be 'admin', 'judge', or 'participant'")
 
@@ -132,27 +160,72 @@ def register(body: RegisterRequest):
         raise HTTPException(status_code=409, detail="Username already taken")
 
     team_id = None
+    event_id = None
+    is_lead = 0
 
-    # Handle team for participants
-    if body.role == "participant" and body.team_name:
-        team_name = body.team_name.strip()
-        # Try to find existing team
-        cursor.execute("SELECT team_id FROM Teams WHERE team_name = ?", (team_name,))
-        existing = cursor.fetchone()
-        if existing:
-            team_id = existing["team_id"]
-        else:
-            # Create new team
-            cursor.execute(
-                "INSERT INTO Teams (team_name, submission_status) VALUES (?, 'pending')",
-                (team_name,),
-            )
-            team_id = cursor.lastrowid
+    if body.role == "admin":
+        if body.invite_code:
+            cursor.execute("SELECT event_id FROM Events WHERE event_code = ?", (body.invite_code.strip().upper(),))
+            event_row = cursor.fetchone()
+            if not event_row:
+                conn.close()
+                raise HTTPException(status_code=400, detail="Invalid Event Code")
+            event_id = event_row["event_id"]
+    
+    elif body.role == "judge":
+        if not body.invite_code:
+            conn.close()
+            raise HTTPException(status_code=400, detail="Judge registration requires an Invite Code")
+        cursor.execute("SELECT event_id FROM Events WHERE judge_invite_code = ?", (body.invite_code.strip().upper(),))
+        event_row = cursor.fetchone()
+        if not event_row:
+            conn.close()
+            raise HTTPException(status_code=400, detail="Invalid Judge Invite Code")
+        event_id = event_row["event_id"]
+
+    elif body.role == "participant":
+        code_to_check = body.event_code or body.invite_code
+        if not code_to_check:
+            conn.close()
+            raise HTTPException(status_code=400, detail="Participant registration requires an Event Code")
+        
+        cursor.execute("SELECT event_id, max_team_size FROM Events WHERE event_code = ?", (code_to_check.strip().upper(),))
+        event_row = cursor.fetchone()
+        if not event_row:
+            conn.close()
+            raise HTTPException(status_code=400, detail="Invalid Event Code")
+        event_id = event_row["event_id"]
+        max_size = event_row["max_team_size"]
+
+        if body.team_name:
+            team_name = body.team_name.strip()
+            # Find existing team *inside this event*
+            cursor.execute("SELECT team_id FROM Teams WHERE team_name = ? AND event_id = ?", (team_name, event_id))
+            existing = cursor.fetchone()
+            if existing:
+                team_id = existing["team_id"]
+                # Enforce team size limit
+                cursor.execute("SELECT COUNT(*) FROM Users WHERE team_id = ?", (team_id,))
+                member_count = cursor.fetchone()[0]
+                if member_count >= max_size:
+                    conn.close()
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Team '{team_name}' has reached its limit of {max_size} members."
+                    )
+            else:
+                # Create new team for this event
+                cursor.execute(
+                    "INSERT INTO Teams (team_name, submission_status, event_id) VALUES (?, 'pending', ?)",
+                    (team_name, event_id),
+                )
+                team_id = cursor.lastrowid
+                is_lead = 1
 
     # Insert user
     cursor.execute(
-        "INSERT INTO Users (username, password_hash, role, team_id) VALUES (?, ?, ?, ?)",
-        (body.username, hash_password(body.password), body.role, team_id),
+        "INSERT INTO Users (username, password_hash, role, team_id, event_id, is_lead) VALUES (?, ?, ?, ?, ?, ?)",
+        (body.username, hash_password(body.password), body.role, team_id, event_id, is_lead),
     )
     user_id = cursor.lastrowid
     conn.commit()
@@ -163,20 +236,18 @@ def register(body: RegisterRequest):
         "user_id": user_id,
         "role": body.role,
         "team_id": team_id,
+        "event_id": event_id
     }
 
 
-# ---------------------------------------------------------------------------
-# POST /login
-# ---------------------------------------------------------------------------
 @app.post("/login", response_model=LoginResponse)
 def login(body: LoginRequest):
-    """Authenticate a user and return their role and team_id."""
+    """Authenticate a user and return their role, team_id and event_id."""
     conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT user_id, role, team_id FROM Users WHERE username = ? AND password_hash = ?",
+        "SELECT user_id, role, team_id, event_id FROM Users WHERE username = ? AND password_hash = ?",
         (body.username, hash_password(body.password)),
     )
     user = cursor.fetchone()
@@ -185,7 +256,12 @@ def login(body: LoginRequest):
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
-    return LoginResponse(user_id=user["user_id"], role=user["role"], team_id=user["team_id"])
+    return LoginResponse(
+        user_id=user["user_id"],
+        role=user["role"],
+        team_id=user["team_id"],
+        event_id=user["event_id"]
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -213,13 +289,16 @@ async def upload_files(files: list[UploadFile] = File(...)):
 # GET /admin/dashboard
 # ---------------------------------------------------------------------------
 @app.get("/admin/dashboard")
-def admin_dashboard():
-    """Return all teams and their submission statuses."""
+def admin_dashboard(event_id: int | None = None):
+    """Return all teams and their submission statuses, filtered by event_id."""
     import json
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams")
+    if event_id:
+        cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams WHERE event_id = ?", (event_id,))
+    else:
+        cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams")
     teams = []
     for row in cursor.fetchall():
         t = dict(row)
@@ -241,16 +320,22 @@ def admin_dashboard():
 # GET /judge/dashboard
 # ---------------------------------------------------------------------------
 @app.get("/judge/dashboard")
-def judge_dashboard():
-    """Return only teams whose submission_status is 'submitted'."""
+def judge_dashboard(event_id: int | None = None):
+    """Return only teams whose submission_status is 'submitted' and belong to event_id."""
     import json
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams WHERE submission_status = ?",
-        ("submitted",),
-    )
+    if event_id:
+        cursor.execute(
+            "SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams WHERE submission_status = ? AND event_id = ?",
+            ("submitted", event_id),
+        )
+    else:
+        cursor.execute(
+            "SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams WHERE submission_status = ?",
+            ("submitted",),
+        )
     teams = []
     for row in cursor.fetchall():
         t = dict(row)
@@ -310,10 +395,25 @@ def participant_submit(body: SubmitRequest):
     cursor = conn.cursor()
 
     # Verify team exists
-    cursor.execute("SELECT team_id FROM Teams WHERE team_id = ?", (body.team_id,))
-    if cursor.fetchone() is None:
+    cursor.execute("SELECT team_id, event_id FROM Teams WHERE team_id = ?", (body.team_id,))
+    team_row = cursor.fetchone()
+    if team_row is None:
         conn.close()
         raise HTTPException(status_code=404, detail=f"Team with id {body.team_id} not found")
+
+    event_id = team_row["event_id"]
+
+    # Enforce submissions open check
+    if event_id:
+        cursor.execute("SELECT submissions_open FROM Events WHERE event_id = ?", (event_id,))
+        evt_row = cursor.fetchone()
+        sub_open = evt_row["submissions_open"] if evt_row else 1
+    else:
+        sub_open = 1
+
+    if not sub_open:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Submissions are currently closed by the organizer.")
 
     cursor.execute(
         "UPDATE Teams SET github_link = ?, project_description = ?, screenshot = ?, submission_status = 'submitted' WHERE team_id = ?",
@@ -329,13 +429,16 @@ def participant_submit(body: SubmitRequest):
 # GET /teams
 # ---------------------------------------------------------------------------
 @app.get("/teams")
-def get_all_teams():
-    """Return all teams and their submission statuses."""
+def get_all_teams(event_id: int | None = None):
+    """Return all teams and their submission statuses, optionally filtered by event_id."""
     import json
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams")
+    if event_id:
+        cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams WHERE event_id = ?", (event_id,))
+    else:
+        cursor.execute("SELECT team_id, team_name, github_link, project_description, screenshot, submission_status FROM Teams")
     teams = []
     for row in cursor.fetchall():
         t = dict(row)
@@ -392,7 +495,7 @@ def get_team_members(team_id: int):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT user_id, username, role FROM Users WHERE team_id = ?", (team_id,))
+    cursor.execute("SELECT user_id, username, role, is_lead FROM Users WHERE team_id = ?", (team_id,))
     members = [dict(row) for row in cursor.fetchall()]
     conn.close()
 
@@ -435,19 +538,50 @@ def judge_publish(body: PublishRequest):
 # ---------------------------------------------------------------------------
 @app.get("/participant/grades/{team_id}")
 def get_participant_grades(team_id: int):
-    """Fetch grades and feedback for a team if published."""
+    """Fetch grades and feedback for a team if published and consensus met."""
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT grades_published FROM Teams WHERE team_id = ?", (team_id,))
+    # Get team details
+    cursor.execute("SELECT grades_published, event_id FROM Teams WHERE team_id = ?", (team_id,))
     team = cursor.fetchone()
     if not team:
         conn.close()
         raise HTTPException(status_code=404, detail="Team not found")
 
-    if not team["grades_published"]:
+    event_id = team["event_id"]
+    if not event_id:
         conn.close()
-        return {"published": False, "evaluations": []}
+        return {"published": False, "reason": "Team is not associated with any event.", "evaluations": []}
+
+    # Consensus Rule: Count total judges registered for this event
+    cursor.execute("SELECT COUNT(*) FROM Users WHERE role = 'judge' AND event_id = ?", (event_id,))
+    total_judges = cursor.fetchone()[0]
+
+    # Count how many evaluations are submitted for this team
+    cursor.execute("SELECT COUNT(DISTINCT judge_id) FROM Evaluations WHERE team_id = ?", (team_id,))
+    evaluated_judges = cursor.fetchone()[0]
+
+    if total_judges == 0:
+        conn.close()
+        return {"published": False, "reason": "No judges have registered for this event yet.", "evaluations": []}
+
+    if evaluated_judges < total_judges:
+        conn.close()
+        return {
+            "published": False,
+            "reason": f"Evaluations are still in progress by the judges ({evaluated_judges}/{total_judges} completed).",
+            "evaluations": []
+        }
+
+    # Fetch event grades publication settings
+    cursor.execute("SELECT grades_published FROM Events WHERE event_id = ?", (event_id,))
+    evt_row = cursor.fetchone()
+    global_pub = evt_row["grades_published"] if evt_row else 0
+
+    if not team["grades_published"] and not global_pub:
+        conn.close()
+        return {"published": False, "reason": "Grades have not been published by the organizer yet.", "evaluations": []}
 
     cursor.execute("SELECT score, feedback FROM Evaluations WHERE team_id = ?", (team_id,))
     evaluations = [dict(row) for row in cursor.fetchall()]
@@ -494,3 +628,223 @@ def update_profile(body: ProfileRequest):
     conn.commit()
     conn.close()
     return {"message": "Profile updated successfully"}
+
+
+# ---------------------------------------------------------------------------
+# GET /public/settings
+# ---------------------------------------------------------------------------
+@app.get("/public/settings")
+def get_public_settings(event_id: int | None = None):
+    """Retrieve basic public system configurations for an event."""
+    conn = get_db()
+    cursor = conn.cursor()
+    if not event_id:
+        # Get first event
+        cursor.execute("SELECT event_id, event_name, max_team_size, countdown_end, submissions_open, grades_published FROM Events ORDER BY event_id LIMIT 1")
+    else:
+        cursor.execute("SELECT event_id, event_name, max_team_size, countdown_end, submissions_open, grades_published FROM Events WHERE event_id = ?", (event_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return {
+            "event_name": "No Event Configured",
+            "team_size_limit": 4,
+            "submissions_open": "false",
+            "countdown_end": "",
+            "grades_published": "false"
+        }
+    return {
+        "event_id": row["event_id"],
+        "event_name": row["event_name"],
+        "team_size_limit": row["max_team_size"],
+        "submissions_open": "true" if row["submissions_open"] else "false",
+        "countdown_end": row["countdown_end"] or "",
+        "grades_published": "true" if row["grades_published"] else "false"
+    }
+
+
+# ---------------------------------------------------------------------------
+# GET /organizer/settings
+# ---------------------------------------------------------------------------
+@app.get("/organizer/settings")
+def get_organizer_settings(event_id: int):
+    """Retrieve all organizer configs for an event."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT event_id, event_name, max_team_size, countdown_end, submissions_open, grades_published, event_code, judge_invite_code FROM Events WHERE event_id = ?", (event_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return {
+        "event_id": row["event_id"],
+        "event_name": row["event_name"],
+        "team_size_limit": row["max_team_size"],
+        "submissions_open": "true" if row["submissions_open"] else "false",
+        "countdown_end": row["countdown_end"] or "",
+        "grades_published": "true" if row["grades_published"] else "false",
+        "event_code": row["event_code"],
+        "judge_invite_code": row["judge_invite_code"]
+    }
+
+
+# ---------------------------------------------------------------------------
+# POST /organizer/settings
+# ---------------------------------------------------------------------------
+@app.post("/organizer/settings")
+def save_organizer_settings(body: OrganizerSettingsRequest):
+    """Update event organizer parameters."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        UPDATE Events 
+        SET event_name = ?, max_team_size = ?, submissions_open = ?, countdown_end = ?, grades_published = ?
+        WHERE event_id = ?
+        """,
+        (body.event_name, body.team_size_limit, 1 if body.submissions_open else 0, body.countdown_end, 1 if body.grades_published else 0, body.event_id)
+    )
+    conn.commit()
+    conn.close()
+    return {"message": "Settings updated successfully"}
+
+
+# ---------------------------------------------------------------------------
+# POST /organizer/create-event
+# ---------------------------------------------------------------------------
+@app.post("/organizer/create-event")
+def create_event(body: EventCreateRequest):
+    """Create a new event, generating organizer and judge invite codes."""
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    import random
+    import string
+    def gen_code(length=6):
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+    
+    event_code = gen_code(6)
+    judge_code = "JDG-" + gen_code(4)
+    
+    while True:
+        cursor.execute("SELECT event_id FROM Events WHERE event_code = ?", (event_code,))
+        if not cursor.fetchone():
+            break
+        event_code = gen_code(6)
+        
+    while True:
+        cursor.execute("SELECT event_id FROM Events WHERE judge_invite_code = ?", (judge_code,))
+        if not cursor.fetchone():
+            break
+        judge_code = "JDG-" + gen_code(4)
+        
+    cursor.execute(
+        """
+        INSERT INTO Events (event_name, event_code, judge_invite_code, max_team_size, countdown_end, created_by)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (body.event_name, event_code, judge_code, body.max_team_size, body.countdown_end, body.created_by)
+    )
+    event_id = cursor.lastrowid
+    
+    # Associate creator organizer with this event
+    cursor.execute("UPDATE Users SET event_id = ? WHERE user_id = ?", (event_id, body.created_by))
+    
+    conn.commit()
+    conn.close()
+    return {
+        "event_id": event_id,
+        "event_name": body.event_name,
+        "event_code": event_code,
+        "judge_invite_code": judge_code
+    }
+
+
+# ---------------------------------------------------------------------------
+# POST /organizer/join-event
+# ---------------------------------------------------------------------------
+@app.post("/organizer/join-event")
+def join_event(body: EventJoinRequest):
+    """Add an organizer to an existing event via event code."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT event_id, event_name FROM Events WHERE event_code = ?", (body.event_code.strip().upper(),))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Invalid Event Code")
+        
+    event_id = row["event_id"]
+    cursor.execute("UPDATE Users SET event_id = ? WHERE user_id = ?", (event_id, body.user_id))
+    conn.commit()
+    conn.close()
+    return {
+        "message": "Successfully joined the event",
+        "event_id": event_id,
+        "event_name": row["event_name"]
+    }
+
+
+# ---------------------------------------------------------------------------
+# GET /organizer/evaluations/{event_id}
+# ---------------------------------------------------------------------------
+@app.get("/organizer/evaluations/{event_id}")
+def get_organizer_evaluations(event_id: int):
+    """Retrieve all judge scores and feedback matrix for this event."""
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT team_id, team_name FROM Teams WHERE event_id = ?", (event_id,))
+    teams = [dict(r) for r in cursor.fetchall()]
+    
+    cursor.execute("SELECT user_id, username FROM Users WHERE role = 'judge' AND event_id = ?", (event_id,))
+    judges = [dict(r) for r in cursor.fetchall()]
+    
+    cursor.execute(
+        """
+        SELECT e.evaluation_id, e.team_id, e.judge_id, e.score, e.feedback, u.username as judge_name
+        FROM Evaluations e
+        JOIN Users u ON e.judge_id = u.user_id
+        WHERE e.team_id IN (SELECT team_id FROM Teams WHERE event_id = ?)
+        """,
+        (event_id,)
+    )
+    evaluations = [dict(r) for r in cursor.fetchall()]
+    
+    conn.close()
+    return {
+        "teams": teams,
+        "judges": judges,
+        "evaluations": evaluations
+    }
+
+
+# ---------------------------------------------------------------------------
+# POST /participant/transfer-leadership
+# ---------------------------------------------------------------------------
+@app.post("/participant/transfer-leadership")
+def transfer_leadership(body: TransferLeadershipRequest):
+    """Swap the team lead user flag to another team member."""
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT team_id, is_lead FROM Users WHERE user_id = ?", (body.leader_id,))
+    lead_user = cursor.fetchone()
+    if not lead_user or not lead_user["is_lead"]:
+        conn.close()
+        raise HTTPException(status_code=403, detail="Only the team leader can transfer leadership")
+        
+    team_id = lead_user["team_id"]
+    
+    cursor.execute("SELECT user_id FROM Users WHERE user_id = ? AND team_id = ?", (body.new_leader_id, team_id))
+    new_lead_user = cursor.fetchone()
+    if not new_lead_user:
+        conn.close()
+        raise HTTPException(status_code=400, detail="New leader must belong to the same team")
+        
+    cursor.execute("UPDATE Users SET is_lead = 0 WHERE user_id = ?", (body.leader_id,))
+    cursor.execute("UPDATE Users SET is_lead = 1 WHERE user_id = ?", (body.new_leader_id,))
+    
+    conn.commit()
+    conn.close()
+    return {"message": "Team leadership transferred successfully"}

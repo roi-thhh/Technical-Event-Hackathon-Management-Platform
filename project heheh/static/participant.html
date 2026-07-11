@@ -188,9 +188,9 @@
 <div class="relative z-10 min-h-full flex flex-col items-center justify-center p-margin-mobile md:p-margin-desktop gap-md">
 <!-- Contextual Status Indicators -->
 <div class="flex flex-wrap justify-center gap-sm mb-sm w-full max-w-2xl">
-<div class="bg-surface-container-high border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2">
+<div id="countdown-badge-container" class="bg-surface-container-high border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2 hidden">
 <span class="material-symbols-outlined text-primary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">timer</span>
-<span class="font-label-sm text-label-sm text-on-surface">12h 45m Remaining</span>
+<span id="countdown-badge" class="font-label-sm text-label-sm text-on-surface">--h --m --s Remaining</span>
 </div>
 <div id="status-badge" class="bg-surface-container-high border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2">
 <span class="material-symbols-outlined text-secondary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
@@ -205,7 +205,7 @@
             <span class="material-symbols-outlined text-3xl text-primary-fixed">waving_hand</span>
         </div>
         <h2 class="font-headline-lg-mobile md:font-headline-lg text-primary-fixed mb-2">Participant Dashboard</h2>
-        <p class="text-on-surface-variant font-body-md">Welcome to ToyCad Hackathon! Track your team progress and submission details here.</p>
+        <p class="text-on-surface-variant font-body-md">Welcome to <span id="dash-event-name" class="font-bold text-on-surface">ToyCad Hackathon</span>! Track your team progress and submission details here.</p>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -219,6 +219,17 @@
         <div class="bg-surface-container-high/40 border border-surface-variant/40 rounded-2xl p-5 flex flex-col gap-2">
             <span class="font-label-sm text-xs text-on-surface-variant uppercase">Submission Status</span>
             <h4 id="dash-submission-status" class="font-headline-lg text-xl text-on-surface-variant capitalize">Pending</h4>
+        </div>
+    </div>
+
+    <!-- Team Members & Leadership Section -->
+    <div id="dash-members-section" class="bg-surface-container-high/30 border border-surface-variant/30 rounded-2xl p-5 flex flex-col gap-3 hidden">
+        <div class="flex justify-between items-center">
+            <span class="font-label-sm text-xs text-on-surface-variant uppercase">Team Members</span>
+            <span id="lead-status-badge" class="hidden inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-fixed/20 text-primary-fixed border border-primary-fixed/30 gap-1"><span class="material-symbols-outlined text-[12px]">grade</span>Team Lead</span>
+        </div>
+        <div id="dash-members-list" class="flex flex-col gap-2">
+            <!-- Members loaded dynamically -->
         </div>
     </div>
 
@@ -788,7 +799,106 @@ document.addEventListener('click', async (e) => {
     }
 });
 
+let countdownInterval = null;
+function initCountdown(countdownEndStr) {
+    if (countdownInterval) clearInterval(countdownInterval);
+    const container = document.getElementById('countdown-badge-container');
+    const badge = document.getElementById('countdown-badge');
+    
+    if (!countdownEndStr) {
+        if (container) container.classList.add('hidden');
+        return;
+    }
+    
+    const endTime = new Date(countdownEndStr).getTime();
+    if (isNaN(endTime)) {
+        if (container) container.classList.add('hidden');
+        return;
+    }
+    
+    if (container) container.classList.remove('hidden');
+    
+    function updateTimer() {
+        const now = new Date().getTime();
+        const diff = endTime - now;
+        
+        if (diff <= 0) {
+            if (badge) {
+                badge.textContent = "Event Ended!";
+                badge.className = 'font-label-sm text-label-sm text-error';
+            }
+            clearInterval(countdownInterval);
+            
+            // Lock submissions if submissions are open but timer ended
+            const uploadBtn = document.getElementById('submit-btn');
+            if (uploadBtn) {
+                uploadBtn.disabled = true;
+                const textSpan = uploadBtn.querySelector('span:first-child');
+                if (textSpan) textSpan.textContent = 'Submissions Closed (Deadline Passed)';
+            }
+            return;
+        }
+        
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        if (badge) {
+            badge.textContent = `${hours}h ${minutes}m ${seconds}s Remaining`;
+            badge.className = 'font-label-sm text-label-sm text-on-surface';
+        }
+    }
+    
+    updateTimer();
+    countdownInterval = setInterval(updateTimer, 1000);
+}
+
+async function loadPublicSettings() {
+    try {
+        const eventId = sessionStorage.getItem('event_id');
+        const url = eventId && eventId !== 'null' ? `/public/settings?event_id=${eventId}` : `/public/settings`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to load public settings");
+        const settings = await res.json();
+        
+        // Update event name
+        const eventNameEl = document.getElementById('dash-event-name');
+        if (eventNameEl && settings.event_name) {
+            eventNameEl.textContent = settings.event_name;
+        }
+        
+        // Initialize countdown
+        initCountdown(settings.countdown_end);
+        
+        // Check submissions status
+        const isSubOpen = (settings.submissions_open === 'true');
+        const statusText = document.getElementById('status-text');
+        const statusBadge = document.getElementById('status-badge');
+        
+        if (statusText) {
+            if (isSubOpen) {
+                statusText.textContent = 'Submission Open';
+                if (statusBadge) statusBadge.className = 'bg-surface-container-high border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2 text-secondary-fixed';
+            } else {
+                statusText.textContent = 'Submission Closed';
+                if (statusBadge) statusBadge.className = 'bg-surface-container-high border border-error/30 rounded-full px-4 py-2 flex items-center gap-2 text-error';
+                
+                // Lock the submission page uploader
+                const uploadBtn = document.getElementById('submit-btn');
+                if (uploadBtn) {
+                    uploadBtn.disabled = true;
+                    const textSpan = uploadBtn.querySelector('span:first-child');
+                    if (textSpan) textSpan.textContent = 'Submissions Locked by Organizer';
+                }
+            }
+        }
+    } catch(err) {
+        console.error(err);
+    }
+}
+
 async function loadDashboardData() {
+    loadPublicSettings();
     const teamId = sessionStorage.getItem('team_id');
     if (!teamId || teamId === 'null') return;
     
@@ -811,8 +921,78 @@ async function loadDashboardData() {
             }
         }
         
+        // Fetch team members list
+        const mRes = await fetch(`/teams/${teamId}/members`);
+        if (mRes.ok) {
+            const mData = await mRes.json();
+            const members = mData.members;
+            
+            const currentUserId = parseInt(sessionStorage.getItem('user_id'));
+            const isCurrentUserLead = members.some(m => m.user_id === currentUserId && m.is_lead);
+            
+            const leadBadge = document.getElementById('lead-status-badge');
+            if (leadBadge) {
+                if (isCurrentUserLead) leadBadge.classList.remove('hidden');
+                else leadBadge.classList.add('hidden');
+            }
+            
+            const listContainer = document.getElementById('dash-members-list');
+            const section = document.getElementById('dash-members-section');
+            if (section) section.classList.remove('hidden');
+            
+            if (listContainer) {
+                listContainer.innerHTML = members.map(m => {
+                    const isLead = m.is_lead;
+                    const transferBtn = (isCurrentUserLead && !isLead) 
+                        ? `<button onclick="transferTeamLead(${m.user_id})" class="bg-surface-container-highest hover:bg-primary-fixed hover:text-on-primary-fixed text-xs font-bold px-3 py-1.5 rounded-full transition-all border border-outline-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">stars</span>Make Lead</button>`
+                        : '';
+                    const leadIndicator = isLead
+                        ? `<span class="inline-flex items-center gap-1 text-primary-fixed text-xs font-semibold bg-primary-fixed/10 border border-primary-fixed/20 px-2 py-0.5 rounded-full"><span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">grade</span>Leader</span>`
+                        : '';
+                        
+                    return `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low/50 border border-surface-variant/30">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-secondary-fixed/20 text-secondary-fixed flex items-center justify-center font-bold text-sm">
+                                ${m.username.charAt(0).toUpperCase()}
+                            </div>
+                            <span class="text-sm font-semibold text-on-surface">${m.username} ${m.user_id === currentUserId ? '(You)' : ''}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            ${leadIndicator}
+                            ${transferBtn}
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        }
+        
     } catch(err) {
         console.error(err);
+    }
+}
+
+async function transferTeamLead(newLeaderId) {
+    const leaderId = parseInt(sessionStorage.getItem('user_id'));
+    if (!confirm("Are you sure you want to transfer team leadership to this member? You will lose lead access.")) return;
+    
+    try {
+        const res = await fetch(`/participant/transfer-leadership`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                leader_id: leaderId,
+                new_leader_id: parseInt(newLeaderId)
+            })
+        });
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || 'Transfer failed');
+        }
+        
+        loadDashboardData();
+    } catch(err) {
+        alert(err.message);
     }
 }
 
@@ -825,10 +1005,10 @@ async function loadGrades() {
         if (!res.ok) return;
         const data = await res.json();
         
+        const container = document.getElementById('dashboard-results-container');
+        if (!container) return;
+        
         if (data.published && data.evaluations.length > 0) {
-            const container = document.getElementById('dashboard-results-container');
-            if (!container) return;
-            
             let html = `<div class="mt-8 pt-6 border-t border-surface-container-highest">
                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary-fixed/20 border-2 border-secondary-fixed/50 mb-4 relative">
                     <span class="material-symbols-outlined text-2xl text-secondary-fixed">emoji_events</span>
@@ -843,12 +1023,22 @@ async function loadGrades() {
                         <span class="font-label-sm uppercase text-on-surface-variant">Evaluation #${idx+1}</span>
                         <span class="font-headline-lg text-secondary-fixed">${ev.score}<span class="text-on-surface-variant text-sm">/10</span></span>
                     </div>
-                    <p class="font-body-md text-on-surface">"${ev.feedback}"</p>
+                    <p class="font-body-md text-on-surface font-semibold">"${ev.feedback}"</p>
                 </div>`;
             });
             
             html += `</div></div>`;
             container.innerHTML = html;
+        } else {
+            container.innerHTML = `
+                <div class="mt-8 pt-6 border-t border-surface-container-highest text-center">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-error-container/20 border-2 border-error/50 mb-4">
+                        <span class="material-symbols-outlined text-2xl text-error">info</span>
+                    </div>
+                    <h3 class="font-headline-lg text-on-surface text-base mb-2">Evaluations Status</h3>
+                    <p class="text-on-surface-variant font-body-md text-sm">${data.reason || "Grades have not been published by the organizer yet."}</p>
+                </div>
+            `;
         }
     } catch(err) {
         console.error('Error fetching grades:', err);
@@ -867,7 +1057,7 @@ setTimeout(() => {
 // Load all teams for the teams tab
 async function loadAllTeams() {
     try {
-        const res = await fetch(`${API}/teams`);
+        const res = await fetch(`${API}/teams?event_id=${sessionStorage.getItem('event_id')}`);
         const data = await res.json();
         const tabEl = document.getElementById('tab-teams');
         if (!tabEl) return;
@@ -1093,6 +1283,9 @@ document.addEventListener('DOMContentLoaded', () => {
             switchTab('drafts'); // or some other tab
         });
     }
+    
+    // Load public settings initially on DOMContentLoaded
+    loadPublicSettings();
 });
 
 </script>

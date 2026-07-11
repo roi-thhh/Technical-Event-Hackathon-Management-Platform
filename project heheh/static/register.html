@@ -108,12 +108,12 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-surface min-h-screen flex items-center justify-center relative overflow-hidden font-body-md text-body-md cad-grid">
+<body class="bg-background text-on-surface min-h-screen flex items-center justify-center relative overflow-y-auto font-body-md text-body-md cad-grid">
 <!-- Decorative ambient shapes -->
 <div class="absolute top-10 right-10 w-64 h-64 bg-secondary-fixed/20 rounded-full blur-[100px] z-0"></div>
 <div class="absolute bottom-10 left-10 w-96 h-96 bg-primary-fixed/10 rounded-full blur-[120px] z-0"></div>
 
-<div class="w-full max-w-[1200px] px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-lg items-center relative z-10 h-full py-xl">
+<div class="w-full max-w-[1200px] px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-lg items-center relative z-10 min-h-screen py-xl">
 
 <!-- Graphic / Branding Section -->
 <div class="hidden md:flex flex-col justify-center items-center h-full relative">
@@ -159,14 +159,27 @@
 <!-- Role Selection -->
 <div class="space-y-xs">
 <label class="font-label-sm text-label-sm text-on-surface ml-4 block uppercase">Role</label>
-<div class="flex gap-3 px-2">
-<button type="button" data-role="participant" class="role-btn flex-1 py-3 px-4 rounded-full border-2 border-secondary-fixed bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98]">
-<span class="material-symbols-outlined text-[16px] align-middle mr-1">build</span>Participant
+<div class="flex gap-2 px-2">
+<button type="button" data-role="participant" class="role-btn flex-1 py-3 px-2 rounded-full border-2 border-secondary-fixed bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] text-[11px] sm:text-xs">
+<span class="material-symbols-outlined text-[14px] align-middle mr-0.5">build</span>Participant
 </button>
-<button type="button" data-role="judge" class="role-btn flex-1 py-3 px-4 rounded-full border-2 border-surface-variant bg-transparent text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] hover:border-primary-fixed">
-<span class="material-symbols-outlined text-[16px] align-middle mr-1">gavel</span>Judge
+<button type="button" data-role="judge" class="role-btn flex-1 py-3 px-2 rounded-full border-2 border-surface-variant bg-transparent text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] hover:border-primary-fixed text-[11px] sm:text-xs">
+<span class="material-symbols-outlined text-[14px] align-middle mr-0.5">gavel</span>Judge
+</button>
+<button type="button" data-role="admin" class="role-btn flex-1 py-3 px-2 rounded-full border-2 border-surface-variant bg-transparent text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] hover:border-primary-fixed text-[11px] sm:text-xs">
+<span class="material-symbols-outlined text-[14px] align-middle mr-0.5">admin_panel_settings</span>Organizer
 </button>
 </div>
+</div>
+
+<!-- Event / Invite Code Field -->
+<div id="code-field" class="space-y-xs">
+<label id="code-label" class="font-label-sm text-label-sm text-on-surface ml-4 block uppercase" for="reg-code">Event Code</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">vpn_key</span>
+<input class="w-full bg-surface-container-lowest text-on-surface border-2 border-surface-variant rounded-full py-4 pl-12 pr-4 focus:outline-none focus:border-secondary-fixed focus:ring-1 focus:ring-secondary-fixed transition-colors placeholder:text-surface-variant font-body-md text-body-md" id="reg-code" placeholder="Enter Event Code" type="text"/>
+</div>
+<p id="code-help" class="font-label-sm text-label-sm text-on-surface-variant/60 ml-4">Ask your event organizer for the Event Code to join the hackathon.</p>
 </div>
 
 <!-- Team Name (only for participants) -->
@@ -210,18 +223,42 @@ document.querySelectorAll('.role-btn').forEach(btn => {
         // Update button styles
         document.querySelectorAll('.role-btn').forEach(b => {
             if (b.dataset.role === selectedRole) {
-                b.className = 'role-btn flex-1 py-3 px-4 rounded-full border-2 border-secondary-fixed bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98]';
+                b.className = 'role-btn flex-1 py-3 px-2 rounded-full border-2 border-secondary-fixed bg-secondary-fixed/20 text-secondary-fixed font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] text-[11px] sm:text-xs';
             } else {
-                b.className = 'role-btn flex-1 py-3 px-4 rounded-full border-2 border-surface-variant bg-transparent text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] hover:border-primary-fixed';
+                b.className = 'role-btn flex-1 py-3 px-2 rounded-full border-2 border-surface-variant bg-transparent text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider text-center transition-all hover:scale-[0.98] hover:border-primary-fixed text-[11px] sm:text-xs';
             }
         });
 
         // Show/hide team field
         const teamField = document.getElementById('team-field');
+        const codeLabel = document.getElementById('code-label');
+        const codeInput = document.getElementById('reg-code');
+        const codeHelp = document.getElementById('code-help');
+        
         if (selectedRole === 'participant') {
             teamField.style.display = '';
-        } else {
+            if (codeLabel) codeLabel.textContent = 'Event Code';
+            if (codeInput) {
+                codeInput.placeholder = 'Enter Event Code';
+                codeInput.disabled = false;
+            }
+            if (codeHelp) codeHelp.textContent = 'Ask your event organizer for the Event Code to join the hackathon.';
+        } else if (selectedRole === 'judge') {
             teamField.style.display = 'none';
+            if (codeLabel) codeLabel.textContent = 'Judge Invite Code';
+            if (codeInput) {
+                codeInput.placeholder = 'Enter Judge Invite Code';
+                codeInput.disabled = false;
+            }
+            if (codeHelp) codeHelp.textContent = 'Enter the unique Judge Invite Code generated by the event organizer.';
+        } else if (selectedRole === 'admin') {
+            teamField.style.display = 'none';
+            if (codeLabel) codeLabel.textContent = 'Event Code (Optional)';
+            if (codeInput) {
+                codeInput.placeholder = 'Enter Event Code to Join (Optional)';
+                codeInput.disabled = false;
+            }
+            if (codeHelp) codeHelp.textContent = 'Enter the Event Code if you are joining an existing hackathon, or leave blank to host a new one.';
         }
     });
 });
@@ -236,6 +273,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     const username = document.getElementById('reg-username').value.trim();
     const password = document.getElementById('reg-password').value;
     const teamName = document.getElementById('reg-team').value.trim();
+    const code = document.getElementById('reg-code').value.trim();
 
     // Validation
     if (!username || !password) {
@@ -247,6 +285,20 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
 
     if (password.length < 4) {
         feedbackEl.textContent = 'Password must be at least 4 characters.';
+        feedbackEl.className = 'px-4 py-3 rounded-full font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        return;
+    }
+
+    if (selectedRole === 'participant' && !code) {
+        feedbackEl.textContent = 'Please enter an Event Code.';
+        feedbackEl.className = 'px-4 py-3 rounded-full font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
+        feedbackEl.classList.remove('hidden');
+        return;
+    }
+
+    if (selectedRole === 'judge' && !code) {
+        feedbackEl.textContent = 'Please enter a Judge Invite Code.';
         feedbackEl.className = 'px-4 py-3 rounded-full font-label-sm text-label-sm text-center bg-error-container/30 border border-error/30 text-error';
         feedbackEl.classList.remove('hidden');
         return;
@@ -268,8 +320,11 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
             password,
             role: selectedRole,
         };
-        if (selectedRole === 'participant' && teamName) {
-            body.team_name = teamName;
+        if (selectedRole === 'participant') {
+            body.event_code = code;
+            if (teamName) body.team_name = teamName;
+        } else {
+            if (code) body.invite_code = code;
         }
 
         const res = await fetch(`${API}/register`, {

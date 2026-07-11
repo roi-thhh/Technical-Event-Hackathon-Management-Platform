@@ -58,8 +58,12 @@ def init_db():
         cursor.execute("ALTER TABLE Teams ADD COLUMN screenshot VARCHAR(255) DEFAULT NULL")
     except sqlite3.OperationalError:
         pass # Column already exists
+    try:
+        cursor.execute("ALTER TABLE Teams ADD COLUMN event_id INTEGER DEFAULT NULL")
+    except sqlite3.OperationalError:
+        pass # Column already exists
 
-    # Schema migration: alter existing Users table for profile columns
+    # Schema migration: alter existing Users table for profile and event columns
     for col, col_type in [
         ("full_name", "VARCHAR(100) DEFAULT NULL"),
         ("email", "VARCHAR(100) DEFAULT NULL"),
@@ -67,7 +71,9 @@ def init_db():
         ("college", "VARCHAR(150) DEFAULT NULL"),
         ("address", "TEXT DEFAULT NULL"),
         ("linkedin", "VARCHAR(255) DEFAULT NULL"),
-        ("github", "VARCHAR(255) DEFAULT NULL")
+        ("github", "VARCHAR(255) DEFAULT NULL"),
+        ("event_id", "INTEGER DEFAULT NULL"),
+        ("is_lead", "INTEGER DEFAULT 0")
     ]:
         try:
             cursor.execute(f"ALTER TABLE Users ADD COLUMN {col} {col_type}")
@@ -84,6 +90,41 @@ def init_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS SystemSettings (
+            key VARCHAR(50) PRIMARY KEY,
+            value TEXT
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Events (
+            event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            event_name VARCHAR(100) NOT NULL,
+            event_code VARCHAR(20) UNIQUE NOT NULL,
+            judge_invite_code VARCHAR(20) UNIQUE NOT NULL,
+            max_team_size INTEGER DEFAULT 4,
+            countdown_end VARCHAR(50) DEFAULT NULL,
+            submissions_open INTEGER DEFAULT 1,
+            grades_published INTEGER DEFAULT 0,
+            created_by INTEGER NOT NULL
+        )
+    """)
+
+    # Seed default settings if empty
+    cursor.execute("SELECT COUNT(*) FROM SystemSettings")
+    if cursor.fetchone()[0] == 0:
+        cursor.executemany(
+            "INSERT INTO SystemSettings (key, value) VALUES (?, ?)",
+            [
+                ("event_name", "ToyCad Hackathon 2026"),
+                ("team_size_limit", "4"),
+                ("submissions_open", "true"),
+                ("countdown_end", ""),
+                ("grades_published", "false")
+            ]
+        )
+
     conn.commit()
     conn.close()
 
@@ -98,21 +139,33 @@ def seed_db():
     count = cursor.fetchone()[0]
 
     if count == 0:
-        # Seed one team
+        # Seed one event
         cursor.execute(
-            "INSERT INTO Teams (team_name, github_link, submission_status) VALUES (?, ?, ?)",
-            ("Team Alpha", None, "pending"),
+            """
+            INSERT INTO Events (event_id, event_name, event_code, judge_invite_code, max_team_size, created_by)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (1, "ToyCad Hackathon 2026", "TOYCAD", "JUDGE123", 4, 1)
         )
 
-        # Seed users: admin, judge, participant
-        users = [
-            ("admin1", hash_password("admin123"), "admin", None),
-            ("judge1", hash_password("judge123"), "judge", None),
-            ("participant1", hash_password("participant123"), "participant", 1),
-        ]
-        cursor.executemany(
-            "INSERT INTO Users (username, password_hash, role, team_id) VALUES (?, ?, ?, ?)",
-            users,
+        # Seed one team
+        cursor.execute(
+            "INSERT INTO Teams (team_id, team_name, github_link, submission_status, event_id) VALUES (?, ?, ?, ?, ?)",
+            (1, "Team Alpha", None, "pending", 1),
+        )
+
+        # Seed users: admin, judge, participant (admin1 event_id=1, judge1 event_id=1, participant1 event_id=1, is_lead=1)
+        cursor.execute(
+            "INSERT INTO Users (user_id, username, password_hash, role, team_id, event_id, is_lead) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (1, "admin1", hash_password("admin123"), "admin", None, 1, 0)
+        )
+        cursor.execute(
+            "INSERT INTO Users (user_id, username, password_hash, role, team_id, event_id, is_lead) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (2, "judge1", hash_password("judge123"), "judge", None, 1, 0)
+        )
+        cursor.execute(
+            "INSERT INTO Users (user_id, username, password_hash, role, team_id, event_id, is_lead) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (3, "participant1", hash_password("participant123"), "participant", 1, 1, 1)
         )
 
         conn.commit()
